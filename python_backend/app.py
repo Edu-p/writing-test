@@ -49,12 +49,20 @@ def chat_response():
 
     response = get_completion_from_messages(messages)
 
-    db.Conversations.insert_one({
-        "thread_id": thread_id,
-        "user_id": user_id,
-        "role": "assistant",
-        "content": response
-    })
+    db.Conversations.insert_many([
+        {
+            "thread_id": thread_id,
+            "user_id": user_id,
+            "role": "user",
+            "content": content
+        },
+        {
+            "thread_id": thread_id,
+            "user_id": user_id,
+            "role": "assistant",
+            "content": response
+        }
+    ])
 
     # print(list(db.Conversations.find()))
 
