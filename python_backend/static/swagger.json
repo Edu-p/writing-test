@@ -1,0 +1,73 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Chat API",
+    "description": "API for handling chat conversations"
+  },
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/chat": {
+      "post": {
+        "summary": "Get response from OpenAI",
+        "description": "Posts a message to the chat and receives a response.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
+                },
+                "thread_id": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "response": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get_conversation": {
+      "get": {
+        "summary": "Get a new conversation thread ID",
+        "description": "Generates a new unique thread ID for starting a conversation.",
+        "responses": {
+          "200": {
+            "description": "A unique thread ID",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "thread_id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

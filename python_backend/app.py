@@ -6,6 +6,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import logging 
+import uuid
 
 load_dotenv()
 
@@ -67,6 +68,11 @@ def chat_response():
     # print(list(db.Conversations.find()))
 
     return jsonify({"response": response})
+
+@app.route('/get_conversation', methods=['GET'])
+def get_conversation():
+    thread_id = str(uuid.uuid4())
+    return jsonify({"thread_id": thread_id})
 
 @app.route('/swagger.json')
 def swagger_json():
