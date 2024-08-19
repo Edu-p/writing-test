@@ -59,7 +59,17 @@ def get_explanation():
     """
         POST in (5).0 
     """
-    
+    data = request.get_json()
+    type_of_test = data['type']
+
+    explanation = db.Explanations.find_one({"type": type_of_test})
+
+    if explanation:
+        explanation_to_return = explanation["explanation"]
+        return jsonify({"explanation": explanation_to_return})
+    else:
+        return jsonify({"error": "Type of test not found"})
+
 
 
 
@@ -99,12 +109,32 @@ def chat_response():
 
     return jsonify({"response": response})
 
-@app.route('/get_conversation', methods=['GET'])
+@app.route('/get_conversation', methods=['POST'])
 def get_conversation():
     """
-        GET in (5).1
+        POST in (5).1
     """
+    data = request.get_json()
+    user_id = data['user_id']
+    type_of_test = data['type_of_test']
+
     thread_id = str(uuid.uuid4())
+
+    if (type_of_test == 'report'):
+        # TODO: improve instantiation of this prompt
+        prompt = """
+            You are a tech lead. The purpose of this conversation is to collect a detailed report from your software engineer. Think about the better type of question that you can ask to gather comprehensive information about their activities, progress, challenges, and any support they might need.
+        """
+        db.Conversations.insert_one({
+            "thread_id": thread_id,
+            "user_id": user_id,
+            "role": "system",
+            "content": prompt
+        })
+
+    else:   
+        return jsonify({"error": "Type of test not found"})
+
     return jsonify({"thread_id": thread_id})
 
 @app.route('/swagger.json')

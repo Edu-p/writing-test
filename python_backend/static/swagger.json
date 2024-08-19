@@ -1,26 +1,10 @@
 {
   "swagger": "2.0",
   "info": {
-    "description": "This is the API documentation for the Chat API.",
-    "version": "1.0.0",
-    "title": "Chat API"
+    "title": "Chat API",
+    "version": "1.0.0"
   },
-  "host": "127.0.0.1:5000",
   "basePath": "/",
-  "tags": [
-    {
-      "name": "auth",
-      "description": "Authentication operations"
-    },
-    {
-      "name": "chat",
-      "description": "Chat operations"
-    },
-    {
-      "name": "conversation",
-      "description": "Conversation operations"
-    }
-  ],
   "schemes": [
     "http"
   ],
@@ -59,7 +43,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful authentication",
+            "description": "User authenticated",
             "schema": {
               "type": "object",
               "properties": {
@@ -70,18 +54,26 @@
             }
           },
           "400": {
-            "description": "Invalid credentials"
+            "description": "Invalid credentials",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/chat": {
+    "/explanations": {
       "post": {
         "tags": [
-          "chat"
+          "explanations"
         ],
-        "summary": "Get chat response",
-        "description": "Get a response from the chat assistant",
+        "summary": "Get explanation",
+        "description": "Get explanation for a type of test",
         "consumes": [
           "application/json"
         ],
@@ -92,7 +84,62 @@
           {
             "in": "body",
             "name": "body",
-            "description": "Chat message",
+            "description": "Type of test",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Explanation found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "explanation": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Type of test not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat": {
+      "post": {
+        "tags": [
+          "chat"
+        ],
+        "summary": "Get chat response",
+        "description": "Get chat response based on user input",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Chat input",
             "required": true,
             "schema": {
               "type": "object",
@@ -126,14 +173,36 @@
       }
     },
     "/get_conversation": {
-      "get": {
+      "post": {
         "tags": [
           "conversation"
         ],
         "summary": "Get a new conversation thread ID",
         "description": "Generate a new conversation thread ID",
+        "consumes": [
+          "application/json"
+        ],
         "produces": [
           "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Conversation details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
+                },
+                "type_of_test": {
+                  "type": "string"
+                }
+              }
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -145,6 +214,37 @@
                   "type": "string"
                 }
               }
+            }
+          },
+          "404": {
+            "description": "Type of test not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/swagger.json": {
+      "get": {
+        "tags": [
+          "swagger"
+        ],
+        "summary": "Get Swagger JSON",
+        "description": "Get the Swagger JSON file",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Swagger JSON file",
+            "schema": {
+              "type": "object"
             }
           }
         }
