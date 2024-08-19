@@ -1,9 +1,11 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Chat API",
-    "version": "1.0.0"
+    "description": "This is the API documentation for the Chat API.",
+    "version": "1.0.0",
+    "title": "Chat API"
   },
+  "host": "localhost:5000",
   "basePath": "/",
   "schemes": [
     "http"
@@ -11,17 +13,8 @@
   "paths": {
     "/auth": {
       "post": {
-        "tags": [
-          "auth"
-        ],
         "summary": "Authenticate user",
         "description": "Authenticate user with email and password",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
         "parameters": [
           {
             "in": "body",
@@ -69,22 +62,13 @@
     },
     "/explanations": {
       "post": {
-        "tags": [
-          "explanations"
-        ],
-        "summary": "Get explanation",
-        "description": "Get explanation for a type of test",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Get explanation for a test type",
+        "description": "Retrieve explanation based on the type of test",
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "description": "Type of test",
+            "description": "Test type",
             "required": true,
             "schema": {
               "type": "object",
@@ -108,7 +92,7 @@
               }
             }
           },
-          "404": {
+          "400": {
             "description": "Type of test not found",
             "schema": {
               "type": "object",
@@ -124,22 +108,13 @@
     },
     "/chat": {
       "post": {
-        "tags": [
-          "chat"
-        ],
         "summary": "Get chat response",
-        "description": "Get chat response based on user input",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "description": "Get a response from the chat based on user input",
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "description": "Chat input",
+            "description": "Chat details",
             "required": true,
             "schema": {
               "type": "object",
@@ -174,17 +149,8 @@
     },
     "/get_conversation": {
       "post": {
-        "tags": [
-          "conversation"
-        ],
-        "summary": "Get a new conversation thread ID",
-        "description": "Generate a new conversation thread ID",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Get conversation thread",
+        "description": "Start a new conversation thread based on the type of test",
         "parameters": [
           {
             "in": "body",
@@ -206,7 +172,7 @@
         ],
         "responses": {
           "200": {
-            "description": "A new conversation thread ID",
+            "description": "Conversation thread created",
             "schema": {
               "type": "object",
               "properties": {
@@ -216,7 +182,7 @@
               }
             }
           },
-          "404": {
+          "400": {
             "description": "Type of test not found",
             "schema": {
               "type": "object",
@@ -232,22 +198,13 @@
     },
     "/get_english_level": {
       "post": {
-        "tags": [
-          "english_level"
-        ],
         "summary": "Get English level",
-        "description": "Get the English level based on previous conversation",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "description": "Compute or retrieve the English level of a user",
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "description": "Conversation details",
+            "description": "User and thread details",
             "required": true,
             "schema": {
               "type": "object",
@@ -264,14 +221,25 @@
         ],
         "responses": {
           "200": {
-            "description": "English level response",
+            "description": "English level retrieved",
             "schema": {
               "type": "object",
               "properties": {
                 "level": {
-                  "type": "string"
+                  "type": "integer"
                 },
                 "CEPR": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to extract JSON from response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
                   "type": "string"
                 }
               }
@@ -280,21 +248,31 @@
         }
       }
     },
-    "/swagger.json": {
-      "get": {
-        "tags": [
-          "swagger"
-        ],
-        "summary": "Get Swagger JSON",
-        "description": "Get the Swagger JSON file",
-        "produces": [
-          "application/json"
+    "/max_english_level": {
+      "post": {
+        "summary": "Get maximum English level",
+        "description": "Retrieve the maximum English level of a user",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
         ],
         "responses": {
           "200": {
-            "description": "Swagger JSON file",
+            "description": "Maximum English level retrieved",
             "schema": {
-              "type": "object"
+              "type": "integer"
             }
           }
         }

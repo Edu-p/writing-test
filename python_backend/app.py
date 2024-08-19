@@ -86,7 +86,7 @@ def chat_response():
     thread_id = data['thread_id']
     content = data['content']
 
-    conversations = db.Conversations.find({"thread_id": thread_id}).sort("_id", 1)
+    conversations = db.Conversations.find({"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
     messages = [{"role": conv["role"], "content": conv["content"]} for conv in conversations]
 
     messages.append({"role": "user", "content": content})
@@ -141,6 +141,9 @@ def get_conversation():
 
 @app.route('/get_english_level', methods=['POST'])
 def get_english_level():
+    """
+        POST in (5).2
+    """
     data = request.get_json()
     user_id = data['user_id']
     thread_id = data['thread_id']
@@ -193,6 +196,30 @@ def get_english_level():
         })
 
         return jsonify(response_dict)
+
+@app.route('/max_english_level', methods=['POST'])
+def max_english_level():
+    """
+        POST in (4).0
+    """
+    data = request.get_json()
+    user_id = data['user_id']
+
+    levels_of_user = db.EnglishLevel.find({"user_id": user_id}).sort("_id", pymongo.ASCENDING)
+
+    cepr_order = ["A1", "A2", "B1", "B2", "C1", "C2"]
+
+    ceprs = [level['CEPR'] for level in levels_of_user]
+
+    if ceprs:
+        max_cepr = max(ceprs, key=lambda cepr: cepr_order.index(cepr))
+        return jsonify({"max_cepr": max_cepr})
+    else:
+        return jsonify({"error": "No CEPR levels found for the user"}), 404
+
+
+
+
 
 @app.route('/swagger.json')
 def swagger_json():
