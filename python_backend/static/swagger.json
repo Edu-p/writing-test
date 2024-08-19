@@ -1,23 +1,98 @@
 {
   "swagger": "2.0",
   "info": {
+    "description": "This is the API documentation for the Chat API.",
     "version": "1.0.0",
-    "title": "Chat API",
-    "description": "API for handling chat conversations"
+    "title": "Chat API"
   },
+  "host": "127.0.0.1:5000",
   "basePath": "/",
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Authentication operations"
+    },
+    {
+      "name": "chat",
+      "description": "Chat operations"
+    },
+    {
+      "name": "conversation",
+      "description": "Conversation operations"
+    }
+  ],
   "schemes": [
     "http"
   ],
   "paths": {
-    "/chat": {
+    "/auth": {
       "post": {
-        "summary": "Get response from OpenAI",
-        "description": "Posts a message to the chat and receives a response.",
+        "tags": [
+          "auth"
+        ],
+        "summary": "Authenticate user",
+        "description": "Authenticate user with email and password",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
         "parameters": [
           {
-            "name": "body",
             "in": "body",
+            "name": "body",
+            "description": "User credentials",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/chat": {
+      "post": {
+        "tags": [
+          "chat"
+        ],
+        "summary": "Get chat response",
+        "description": "Get a response from the chat assistant",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Chat message",
             "required": true,
             "schema": {
               "type": "object",
@@ -37,7 +112,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Successful response",
+            "description": "Chat response",
             "schema": {
               "type": "object",
               "properties": {
@@ -52,11 +127,17 @@
     },
     "/get_conversation": {
       "get": {
+        "tags": [
+          "conversation"
+        ],
         "summary": "Get a new conversation thread ID",
-        "description": "Generates a new unique thread ID for starting a conversation.",
+        "description": "Generate a new conversation thread ID",
+        "produces": [
+          "application/json"
+        ],
         "responses": {
           "200": {
-            "description": "A unique thread ID",
+            "description": "A new conversation thread ID",
             "schema": {
               "type": "object",
               "properties": {

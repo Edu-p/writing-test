@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 CORS(app)
 
-# setup mongo
+# setup mongo and open ai api key
 MONGO_URI = os.getenv('MONGO_URI')
 os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
 client = MongoClient(MONGO_URI)
@@ -36,8 +36,38 @@ def get_completion_from_messages(messages, model='gpt-4o-mini'):
     )
     return completion.choices[0].message.content
 
+# routes
+@app.route('/auth', methods=['POST'])
+def auth(): 
+    """
+        POST in (1).0
+    """
+    data = request.get_json()
+    email = data['email']
+    password = data['password']
+    
+    user = db.Users.find_one({"email": email, "password": password})
+    
+    if user:
+        user_id = user["user_id"]
+        return jsonify({"user_id": user_id})
+    else:
+        return jsonify({"error": "Invalid credentials"})
+
+@app.route('/explanations', methods=['POST'])
+def get_explanation():
+    """
+        POST in (5).0 
+    """
+    
+
+
+
 @app.route('/chat', methods=['POST'])
 def chat_response():
+    """
+        POST in (5).1
+    """
     data = request.get_json()
     user_id = data['user_id']
     thread_id = data['thread_id']
@@ -71,6 +101,9 @@ def chat_response():
 
 @app.route('/get_conversation', methods=['GET'])
 def get_conversation():
+    """
+        GET in (5).1
+    """
     thread_id = str(uuid.uuid4())
     return jsonify({"thread_id": thread_id})
 
