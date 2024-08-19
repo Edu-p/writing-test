@@ -7,12 +7,39 @@
   },
   "host": "localhost:5000",
   "basePath": "/",
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Authentication related endpoints"
+    },
+    {
+      "name": "explanations",
+      "description": "Endpoints related to explanations"
+    },
+    {
+      "name": "chat",
+      "description": "Chat related endpoints"
+    },
+    {
+      "name": "conversation",
+      "description": "Conversation related endpoints"
+    },
+    {
+      "name": "english_level",
+      "description": "Endpoints related to English level"
+    },
+    {
+      "name": "tests",
+      "description": "Endpoints related to tests"
+    }
+  ],
   "schemes": [
     "http"
   ],
   "paths": {
     "/auth": {
       "post": {
+        "tags": ["auth"],
         "summary": "Authenticate user",
         "description": "Authenticate user with email and password",
         "parameters": [
@@ -36,7 +63,7 @@
         ],
         "responses": {
           "200": {
-            "description": "User authenticated",
+            "description": "Successful authentication",
             "schema": {
               "type": "object",
               "properties": {
@@ -62,13 +89,14 @@
     },
     "/explanations": {
       "post": {
-        "summary": "Get explanation for a test type",
-        "description": "Retrieve explanation based on the type of test",
+        "tags": ["explanations"],
+        "summary": "Get explanation",
+        "description": "Get explanation for a specific type of test",
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "description": "Test type",
+            "description": "Type of test",
             "required": true,
             "schema": {
               "type": "object",
@@ -82,7 +110,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Explanation found",
+            "description": "Successful retrieval",
             "schema": {
               "type": "object",
               "properties": {
@@ -108,8 +136,9 @@
     },
     "/chat": {
       "post": {
+        "tags": ["chat"],
         "summary": "Get chat response",
-        "description": "Get a response from the chat based on user input",
+        "description": "Get chat response based on user input",
         "parameters": [
           {
             "in": "body",
@@ -134,7 +163,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Chat response",
+            "description": "Successful response",
             "schema": {
               "type": "object",
               "properties": {
@@ -149,8 +178,9 @@
     },
     "/get_conversation": {
       "post": {
-        "summary": "Get conversation thread",
-        "description": "Start a new conversation thread based on the type of test",
+        "tags": ["conversation"],
+        "summary": "Get conversation",
+        "description": "Get conversation based on type of test",
         "parameters": [
           {
             "in": "body",
@@ -172,7 +202,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Conversation thread created",
+            "description": "Successful retrieval",
             "schema": {
               "type": "object",
               "properties": {
@@ -198,13 +228,14 @@
     },
     "/get_english_level": {
       "post": {
+        "tags": ["english_level"],
         "summary": "Get English level",
-        "description": "Compute or retrieve the English level of a user",
+        "description": "Get English level based on conversation",
         "parameters": [
           {
             "in": "body",
             "name": "body",
-            "description": "User and thread details",
+            "description": "English level details",
             "required": true,
             "schema": {
               "type": "object",
@@ -221,7 +252,7 @@
         ],
         "responses": {
           "200": {
-            "description": "English level retrieved",
+            "description": "Successful retrieval",
             "schema": {
               "type": "object",
               "properties": {
@@ -250,8 +281,9 @@
     },
     "/max_english_level": {
       "post": {
-        "summary": "Get maximum English level",
-        "description": "Retrieve the maximum English level of a user",
+        "tags": ["english_level"],
+        "summary": "Get max English level",
+        "description": "Get maximum English level for a user",
         "parameters": [
           {
             "in": "body",
@@ -270,9 +302,59 @@
         ],
         "responses": {
           "200": {
-            "description": "Maximum English level retrieved",
+            "description": "Successful retrieval",
             "schema": {
-              "type": "integer"
+              "type": "object",
+              "properties": {
+                "max_cepr": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No CEPR levels found for the user",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/return_all_tests": {
+      "post": {
+        "tags": ["tests"],
+        "summary": "Return all tests",
+        "description": "Return all tests for a user",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
             }
           }
         }
