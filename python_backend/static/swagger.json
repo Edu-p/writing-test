@@ -230,6 +230,56 @@
         }
       }
     },
+    "/get_english_level": {
+      "post": {
+        "tags": [
+          "english_level"
+        ],
+        "summary": "Get English level",
+        "description": "Get the English level based on previous conversation",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Conversation details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
+                },
+                "thread_id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "English level response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "level": {
+                  "type": "string"
+                },
+                "CEPR": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/swagger.json": {
       "get": {
         "tags": [

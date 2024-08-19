@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_swagger_ui import get_swaggerui_blueprint
 from flask_cors import CORS
-from pymongo import MongoClient
+from pymongo import MongoClient, ASCENDING
+import pymongo
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
@@ -123,19 +124,48 @@ def get_conversation():
     if (type_of_test == 'report'):
         # TODO: improve instantiation of this prompt
         prompt = """
-            You are a tech lead. The purpose of this conversation is to collect a detailed report from your software engineer. Think about the better type of question that you can ask to gather comprehensive information about their activities, progress, challenges, and any support they might need.
+            You are a tech lead. The purpose of this conversation is to collect a detailed report from your software engineer. Think about the better type of question that you can ask to gather comprehensive information about their activities, progress, challenges, and any support they might need. \
+            Please, be short as possible on your responses.
         """
+        
         db.Conversations.insert_one({
             "thread_id": thread_id,
             "user_id": user_id,
             "role": "system",
             "content": prompt
         })
-
     else:   
         return jsonify({"error": "Type of test not found"})
 
     return jsonify({"thread_id": thread_id})
+
+@app.route('/get_english_level', methods=['POST'])
+def get_english_level():
+    data = request.get_json()
+    user_id = data['user_id']
+    thread_id = data['thread_id']
+
+    conversations = db.Conversations.find({"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
+    
+    messages = [{"role": conv["role"], "content": conv["content"]} for conv in conversations]
+
+    prompt_english_level = """
+        Identify the items based on previous conversation:
+            - Level of english(0% min and 100% max)
+            - CEPR(A1, A2,..., C2)
+        
+        To evaluate the level of user you can think in these criteria "Grammar and Syntax", "Vocabulary and Word Choice", "Coherence and Cohesion", "Clarity of Expression", "Task Achievement". \
+        Format your response as a JSON object with \
+        "level" and "CEPR". \
+        I don't want you to send any other token outside of this json, just the json. \
+        Make your response as short as possible.
+    """
+
+    messages.append({"role": "user", "content": prompt_english_level})
+
+    response = get_completion_from_messages(messages)
+
+    return response 
 
 @app.route('/swagger.json')
 def swagger_json():
