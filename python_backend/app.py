@@ -8,6 +8,8 @@ import os
 from dotenv import load_dotenv
 import logging 
 import uuid
+import json
+import re
 
 load_dotenv()
 
@@ -106,8 +108,6 @@ def chat_response():
         }
     ])
 
-    # print(list(db.Conversations.find()))
-
     return jsonify({"response": response})
 
 @app.route('/get_conversation', methods=['POST'])
@@ -144,28 +144,55 @@ def get_english_level():
     data = request.get_json()
     user_id = data['user_id']
     thread_id = data['thread_id']
-
-    conversations = db.Conversations.find({"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
     
-    messages = [{"role": conv["role"], "content": conv["content"]} for conv in conversations]
-
-    prompt_english_level = """
-        Identify the items based on previous conversation:
-            - Level of english(0% min and 100% max)
-            - CEPR(A1, A2,..., C2)
+    # check if already exists on EnglishLevel
+    already_computed = db.EnglishLevel.find_one({"thread_id": thread_id, "user_id": user_id})
+    if already_computed:
+        return jsonify({"level": already_computed['level'], "CEPR": already_computed['CEPR']})
+    # if doesnt exist, compute
+    else:
+        conversations = db.Conversations.find({"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
+            
+        messages = [{"role": conv["role"], "content": conv["content"]} for conv in conversations]
         
-        To evaluate the level of user you can think in these criteria "Grammar and Syntax", "Vocabulary and Word Choice", "Coherence and Cohesion", "Clarity of Expression", "Task Achievement". \
-        Format your response as a JSON object with \
-        "level" and "CEPR". \
-        I don't want you to send any other token outside of this json, just the json. \
-        Make your response as short as possible.
-    """
+        # TODO: improve instantiation of this prompt
+        prompt_english_level = """
+            Identify the items based on previous conversation:
+                - Level of english(0% min and 100% max)
+                - CEPR(A1, A2,..., C2)
+            
+            To evaluate the level of user you can think in these criteria "Grammar and Syntax", "Vocabulary and Word Choice", "Coherence and Cohesion", "Clarity of Expression", "Task Achievement". \
+            Format your response as a JSON object with \
+            "level" and "CEPR". \
+            I don't want you to send any other token outside of this json, just the json. \
+            Make your response as short as possible.
+        """
 
-    messages.append({"role": "user", "content": prompt_english_level})
+        messages.append({"role": "user", "content": prompt_english_level})
 
-    response = get_completion_from_messages(messages)
+        response = get_completion_from_messages(messages)
 
-    return response 
+        print(f"res:\n\n{response}\n\n")
+
+        match = re.search(r'\{\s*"level"\s*:\s*\d+\s*,\s*"CEPR"\s*:\s*"[A-Z0-9]+"\s*\}', response, re.DOTALL)
+
+        print(f"match:\n\n{match}\n\n")
+
+        if match:
+            response_json = match.group(0)
+        else:
+            return jsonify({"error": "Failed to extract JSON from response"}), 500
+
+        response_dict = json.loads(response_json)
+        
+        db.EnglishLevel.insert_one({
+            "thread_id": thread_id,
+            "user_id": user_id,
+            "level": response_dict['level'],
+            "CEPR": response_dict['CEPR']
+        })
+
+        return jsonify(response_dict)
 
 @app.route('/swagger.json')
 def swagger_json():
