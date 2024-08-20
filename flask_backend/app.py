@@ -53,9 +53,9 @@ def auth():
     
     if user:
         user_id = user["user_id"]
-        return jsonify({"user_id": user_id})
+        return jsonify({"user_id": user_id}), 200
     else:
-        return jsonify({"error": "Invalid credentials"})
+        return jsonify({"error": "Invalid credentials"}), 404
 
 @app.route('/explanations', methods=['POST'])
 def get_explanation():
