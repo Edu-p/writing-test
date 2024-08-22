@@ -11,8 +11,6 @@ def report_test():
         st.session_state.conversation = []
     if 'thread_id' not in st.session_state:
         st.session_state['thread_id'] = None
-        
-
 
     # get thread_id to start conversation
     user_id = st.session_state['user_id']
@@ -26,7 +24,7 @@ def report_test():
             url='http://localhost:5000/get_conversation',
             json={
                 'user_id': user_id,
-                'type_of_test': 'report'
+                'type_of_test': 'report'   
             }   
         )
         
@@ -46,7 +44,22 @@ def report_test():
         if user_input:
             st.session_state.conversation.append(f"You: {user_input}")
 
-            response = f"Bot: This is a response to '{user_input}', thread_id -> {thread_id}"
+            response_to_input = requests.post(
+                # TODO: change when deploy
+                url='http://localhost:5000/chat',
+                json={
+                    'user_id': user_id,
+                    'thread_id': thread_id,
+                    'content': user_input   
+                }   
+            )
+
+            data = response_to_input.json()
+            llm_response = data['response'] 
+
+            response = (f"Bot: {llm_response}\n")
+            print(f"Bot: {llm_response}', thread_id -> {thread_id}")
+
             st.session_state.conversation.append(response)
 
             st.rerun()
