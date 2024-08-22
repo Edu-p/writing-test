@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import time 
 
 def report_test():
     st.title("Chatbot Conversation")
@@ -11,6 +12,8 @@ def report_test():
         st.session_state.conversation = []
     if 'thread_id' not in st.session_state:
         st.session_state['thread_id'] = None
+    if 'step_of_conversation' not in st.session_state:
+        st.session_state['step_of_conversation'] = 0
 
     # get thread_id to start conversation
     user_id = st.session_state['user_id']
@@ -42,26 +45,51 @@ def report_test():
 
     if st.button("Send"):
         if user_input:
-            st.session_state.conversation.append(f"You: {user_input}")
+            st.session_state['step_of_conversation'] += 1
+            if st.session_state['step_of_conversation'] <= 3:
+                st.session_state.conversation.append(f"You: {user_input}")
+                response_to_input = requests.post(
+                    # TODO: change when deploy
+                    url='http://localhost:5000/chat',
+                    json={
+                        'user_id': user_id,
+                        'thread_id': thread_id,
+                        'content': user_input   
+                    }   
+                )
 
-            response_to_input = requests.post(
-                # TODO: change when deploy
-                url='http://localhost:5000/chat',
-                json={
-                    'user_id': user_id,
-                    'thread_id': thread_id,
-                    'content': user_input   
-                }   
-            )
+                data = response_to_input.json()
+                llm_response = data['response'] 
 
-            data = response_to_input.json()
-            llm_response = data['response'] 
+                response = (f"Bot: {llm_response}\n{st.session_state['step_of_conversation']} exchange\n")
+                print(f"Bot: {llm_response}', thread_id -> {thread_id}")
 
-            response = (f"Bot: {llm_response}\n")
-            print(f"Bot: {llm_response}', thread_id -> {thread_id}")
+                st.session_state.conversation.append(response)
 
-            st.session_state.conversation.append(response)
+                st.rerun()
+            else:
+                st.session_state.conversation.append(f"You: {user_input}")
+                response_to_input = requests.post(
+                    # TODO: change when deploy
+                    url='http://localhost:5000/chat',
+                    json={
+                        'user_id': user_id,
+                        'thread_id': thread_id,
+                        'content': user_input   
+                    }   
+                )
 
-            st.rerun()
+                data = response_to_input.json()
+                llm_response = data['response'] 
+
+                response = (f"Bot: {llm_response}\n{st.session_state['step_of_conversation']} exchange\n")
+                print(f"Bot: {llm_response}', thread_id -> {thread_id}")
+
+                st.session_state.conversation.append(response)
+                time.sleep(2)
+
+                st.session_state['page'] = 'report_activity_3'
+
+                st.rerun()
 
 report_test()
