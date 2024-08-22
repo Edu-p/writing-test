@@ -1,6 +1,6 @@
 import streamlit as st
 import requests 
-
+import time
 
 def show_auth_form():
     st.title("Welcome to Writing Test Platform")
@@ -26,9 +26,13 @@ def show_auth_form():
         if response.status_code == 200:
             data = response.json()
             st.session_state['user_id'] = data['user_id']
-            # trigger to another page
+            st.session_state['page'] = 'choose_wtd'
 
             st.success("Logged!!")
-            
+
+            time.sleep(2)
+
+            st.rerun()
+        
         else:
             st.error("Login failed.")

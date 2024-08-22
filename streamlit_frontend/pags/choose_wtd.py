@@ -25,7 +25,7 @@ def choose_what_to_do():
 
     
     with st.container():
-        st.title("")
+        st.title("What do you want to do?")
         st.subheader("")
         st.markdown('<div class="centered-buttons">', unsafe_allow_html=True)
 
@@ -33,8 +33,9 @@ def choose_what_to_do():
 
         with col1:
             if st.button("Do a new test"):
-                # TODO: trigger
-                pass
+                st.session_state['page'] = 'choose_wtc'
+
+                st.rerun()
         
         with col4:
             if st.button("View your metrics"):

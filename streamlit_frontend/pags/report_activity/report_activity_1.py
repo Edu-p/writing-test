@@ -23,7 +23,7 @@ def explanation_of_test():
 
     with col1:
         if st.button("Do the test"):
-            st.session_state['page'] = ''
+            st.session_state['page'] = 'report_activity_2'
             st.rerun()
     with col5:
         if st.button("Previous page"):
