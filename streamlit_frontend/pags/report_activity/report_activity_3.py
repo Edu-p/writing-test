@@ -10,8 +10,8 @@ def show_conversation_summary():
         # TODO: change when deploy
         url='http://localhost:5000/get_english_level',
         json={
-            "user_id": st.session_state['thread_id'],
-            "thread_id": st.session_state['user_id']
+            "user_id": st.session_state['user_id'],
+            "thread_id": st.session_state['thread_id']
         }
     ) 
     if response.status_code == 200:

@@ -12,12 +12,14 @@ def view_overall_metrics():
                 'user_id': st.session_state['user_id'],
             }   
     )
-    
-    data = response_get_max_metric.json()
+    if response_get_max_metric.status_code == 200:
+        data = response_get_max_metric.json()
 
-    max_cepr = data['max_cepr']
+        max_cepr = data['max_cepr']
 
-    st.markdown(f"<h2 style='font-size:30px;'>Max level: {max_cepr}</h2>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='font-size:30px;'>Max level: {max_cepr}</h2>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<h2 style='font-size:30px;'>To compute max level you need to do a test</h2>", unsafe_allow_html=True)
 
     st.write("")
     st.write("")
