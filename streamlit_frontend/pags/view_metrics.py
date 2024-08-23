@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 
-
 def view_overall_metrics():
     st.title('')
 
@@ -37,7 +36,8 @@ def view_overall_metrics():
         </style>
     """, unsafe_allow_html=True)
 
-    if st.button("button"):
-        st.write("clicked")
+    if st.button("Past tests"):
+        st.session_state['page'] = 'past_tests'
+        st.rerun()
 
 view_overall_metrics()
