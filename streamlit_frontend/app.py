@@ -7,6 +7,7 @@ from pags.report_activity.report_activity_2 import report_test
 from pags.report_activity.report_activity_3 import show_conversation_summary
 
 from pags.view_metrics import view_overall_metrics
+from pags.past_tests import show_import_tests
 
 st.set_page_config(page_title="Writing Test Platform", layout="centered", initial_sidebar_state="collapsed")
 
@@ -32,4 +33,6 @@ elif st.session_state['page'] == 'report_activity_3':
 # flux see metrics
 elif st.session_state['page'] == 'view_overall':
     view_overall_metrics()
+elif st.session_state['page'] == 'past_tests':
+    show_import_tests()
 
