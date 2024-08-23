@@ -1,11 +1,23 @@
 import streamlit as st
+import requests
+
 
 def view_overall_metrics():
     st.title('')
-    
-    # verifications in session state 
 
-    st.markdown(f"<h2 style='font-size:30px;'>{}</h2>", unsafe_allow_html=True)
+    response_get_max_metric = requests.post(
+            # TODO: change when deploy
+            url='http://localhost:5000/max_english_level',
+            json={
+                'user_id': st.session_state['user_id'],
+            }   
+    )
+    
+    data = response_get_max_metric.json()
+
+    max_cepr = data['max_cepr']
+
+    st.markdown(f"<h2 style='font-size:30px;'>Max level: {max_cepr}</h2>", unsafe_allow_html=True)
 
     st.write("")
     st.write("")
