@@ -6,6 +6,8 @@ from pags.report_activity.report_activity_1 import explanation_of_test
 from pags.report_activity.report_activity_2 import report_test
 from pags.report_activity.report_activity_3 import show_conversation_summary
 
+from pags.view_metrics import view_overall_metrics
+
 st.set_page_config(page_title="Writing Test Platform", layout="centered", initial_sidebar_state="collapsed")
 
 if 'page' not in st.session_state:
@@ -16,6 +18,8 @@ if st.session_state['page'] == 'auth':
     show_auth_form()
 elif st.session_state['page'] == 'choose_wtd':
     choose_what_to_do()
+
+# flux another test
 elif st.session_state['page'] == 'choose_wtc':
     choose_what_type_of_chat()
 elif st.session_state['page'] == 'report_activity_1':
@@ -25,4 +29,7 @@ elif st.session_state['page'] == 'report_activity_2':
 elif st.session_state['page'] == 'report_activity_3':
     show_conversation_summary()
 
+# flux see metrics
+elif st.session_state['page'] == 'view_overall':
+    view_overall_metrics()
 

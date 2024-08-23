@@ -39,8 +39,10 @@ def choose_what_to_do():
         
         with col4:
             if st.button("View your metrics"):
-                # TODO: trigger
-                pass
+                st.session_state['page'] = 'view_overall'
+
+                st.rerun()
+
         st.markdown('</div>', unsafe_allow_html=True)
 
 choose_what_to_do()
