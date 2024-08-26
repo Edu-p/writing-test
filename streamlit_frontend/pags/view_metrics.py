@@ -23,6 +23,9 @@ def view_overall_metrics():
         st.markdown(f"<h2 style='font-size:30px;'>To compute max level you need to do a test</h2>", unsafe_allow_html=True)
 
     st.write("")
+    if st.button("Previous"):
+        st.session_state['page'] = 'choose_wtd'
+        st.rerun()
     st.write("")
     st.write("")
     st.write("")
