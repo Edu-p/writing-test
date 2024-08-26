@@ -1,5 +1,5 @@
 Flask==3.0.3
-flask-swagger-ui==4.0.1
+flask-swagger-ui
 flask-cors==4.0.1
 pymongo==4.8.0
 openai==1.41.1
