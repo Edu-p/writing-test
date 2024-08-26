@@ -4,11 +4,13 @@ import requests
 def view_overall_metrics():
     st.title('')
 
+    user_id = st.session_state['user_id']
+
     response_get_max_metric = requests.post(
             # TODO: change when deploy
             url='http://localhost:5000/max_english_level',
             json={
-                'user_id': st.session_state['user_id'],
+                'user_id': user_id,
             }   
     )
     if response_get_max_metric.status_code == 200:
@@ -39,5 +41,3 @@ def view_overall_metrics():
     if st.button("Past tests"):
         st.session_state['page'] = 'past_tests'
         st.rerun()
-
-view_overall_metrics()
