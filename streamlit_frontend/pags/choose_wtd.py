@@ -44,5 +44,3 @@ def choose_what_to_do():
                 st.rerun()
 
         st.markdown('</div>', unsafe_allow_html=True)
-
-choose_what_to_do()

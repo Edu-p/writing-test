@@ -91,5 +91,3 @@ def report_test():
                 st.session_state['page'] = 'report_activity_3'
 
                 st.rerun()
-
-report_test()
