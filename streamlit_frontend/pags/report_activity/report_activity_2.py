@@ -5,6 +5,8 @@ import time
 def report_test():
     st.title("Chatbot Conversation")
 
+    print('pass report 2')
+    
     # verifications in session state
     if 'user_id' not in st.session_state:
         st.session_state['user_id'] = '' 
@@ -21,7 +23,7 @@ def report_test():
 
     if thread_id:
         print('Thread ID exists:', thread_id)
-    else:
+    else:   
         response_to_thread_id = requests.post(
             # TODO: change when deploy
             url='http://localhost:5000/get_conversation',
@@ -91,3 +93,4 @@ def report_test():
                 st.session_state['page'] = 'report_activity_3'
 
                 st.rerun()
+

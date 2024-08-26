@@ -1,6 +1,9 @@
 import streamlit as st
 
 def choose_what_to_do():
+    print(st.session_state)
+    print('pass wtd')
+    
     st.markdown(
         """
         <style>
@@ -21,8 +24,6 @@ def choose_what_to_do():
         """,
         unsafe_allow_html=True
     )
-
-
     
     with st.container():
         st.title("What do you want to do?")
