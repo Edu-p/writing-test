@@ -17,5 +17,8 @@ def show_conversation_summary():
     if response.status_code == 200:
         data = response.json()
         st.text_area("", f"You have achieved: {data['CEPR']}, you can be considered at {data['level']} level")
+        if st.button("Back to main menu"):
+            st.session_state['page'] = 'choose_wtd'
+            st.rerun()
     else:
         st.error("Problem in request.")

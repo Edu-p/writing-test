@@ -1,0 +1,9 @@
+/.venv
+
+/Anot
+
+/streamlit_frontend/pags/__pycache__/
+
+/streamlit_frontend/pags/report_activity/__pycache__/
+
+/flask_backend/.env
