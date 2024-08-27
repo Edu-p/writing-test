@@ -45,10 +45,11 @@ def report_test():
 
     user_input = st.text_input("Your message:")
 
-    if st.button("Send"):
-        if user_input:
-            st.session_state['step_of_conversation'] += 1
-            if st.session_state['step_of_conversation'] <= 3:
+
+    if st.session_state['step_of_conversation'] < 3:
+        if st.button("Send"):
+            if user_input:
+                st.session_state['step_of_conversation'] += 1
                 st.session_state.conversation.append(f"You: {user_input}")
                 response_to_input = requests.post(
                     # TODO: change when deploy
@@ -69,28 +70,11 @@ def report_test():
                 st.session_state.conversation.append(response)
 
                 st.rerun()
-            else:
-                st.session_state.conversation.append(f"You: {user_input}")
-                response_to_input = requests.post(
-                    # TODO: change when deploy
-                    url='http://localhost:5000/chat',
-                    json={
-                        'user_id': user_id,
-                        'thread_id': thread_id,
-                        'content': user_input   
-                    }   
-                )
+    else:
+        time.sleep(2)
 
-                data = response_to_input.json()
-                llm_response = data['response'] 
+        st.session_state['page'] = 'report_activity_3'
 
-                response = (f"Bot: {llm_response}\n{st.session_state['step_of_conversation']} exchange\n")
-                print(f"Bot: {llm_response}', thread_id -> {thread_id}")
-
-                st.session_state.conversation.append(response)
-                time.sleep(2)
-
-                st.session_state['page'] = 'report_activity_3'
-
-                st.rerun()
+        st.rerun()
+                    
 
