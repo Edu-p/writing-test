@@ -15,7 +15,7 @@ def explanation_of_test():
         data = response.json()
         # display the main button 
         text_of_explanation = data['explanation']
-        st.text_area("", text_of_explanation)
+        st.text_area("", text_of_explanation, height=150)
     else:
         st.error("Problem in request.")
     

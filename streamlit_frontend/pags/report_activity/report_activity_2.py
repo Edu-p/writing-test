@@ -32,15 +32,15 @@ def report_test():
                 'type_of_test': 'report'   
             }   
         )
-        
         data = response_to_thread_id.json()
         st.session_state['thread_id'] = data['thread_id']
         thread_id = st.session_state['thread_id']
 
     if st.session_state['step_of_conversation'] == 0:
-        st.session_state.conversation.append("Bot: Hi! I'm your tech lead. Can you tell me what you did today?")
+        st.session_state.conversation.append("Bot: Hi! I'm your tech lead. Can you tell me what you did today?\n")
         conversation_display = "\n".join(st.session_state.conversation)
         st.text_area("Conversation", conversation_display, height=300, disabled=True)
+        st.session_state['step_of_conversation'] += 1
     else:
         conversation_display = "\n".join(st.session_state.conversation)
         st.text_area("Conversation", conversation_display, height=300, disabled=True)
@@ -48,7 +48,7 @@ def report_test():
     user_input = st.text_input("Your message:")
 
 
-    if st.session_state['step_of_conversation'] < 3:
+    if st.session_state['step_of_conversation'] < 4:
         if st.button("Send"):
             if user_input:
                 st.session_state['step_of_conversation'] += 1
@@ -66,7 +66,7 @@ def report_test():
                 data = response_to_input.json()
                 llm_response = data['response'] 
 
-                response = (f"Bot: {llm_response}\n{st.session_state['step_of_conversation']} exchange\n")
+                response = (f"Bot: {llm_response}\n")
                 print(f"Bot: {llm_response}', thread_id -> {thread_id}")
 
                 st.session_state.conversation.append(response)
