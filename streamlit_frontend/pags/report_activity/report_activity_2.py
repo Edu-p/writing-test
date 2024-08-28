@@ -37,11 +37,13 @@ def report_test():
         st.session_state['thread_id'] = data['thread_id']
         thread_id = st.session_state['thread_id']
 
-        # print(f"\n\n\n thread_id:{thread_id} -- {type(thread_id)} \n\n")
-
-
-    conversation_display = "\n".join(st.session_state.conversation)
-    st.text_area("Conversation", conversation_display, height=300, disabled=True)
+    if st.session_state['step_of_conversation'] == 0:
+        st.session_state.conversation.append("Bot: Hi! I'm your tech lead. Can you tell me what you did today?")
+        conversation_display = "\n".join(st.session_state.conversation)
+        st.text_area("Conversation", conversation_display, height=300, disabled=True)
+    else:
+        conversation_display = "\n".join(st.session_state.conversation)
+        st.text_area("Conversation", conversation_display, height=300, disabled=True)
 
     user_input = st.text_input("Your message:")
 
