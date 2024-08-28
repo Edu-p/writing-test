@@ -16,6 +16,10 @@ def report_test():
         st.session_state['thread_id'] = None
     if 'step_of_conversation' not in st.session_state:
         st.session_state['step_of_conversation'] = 0
+    if 'send_button_clicked' not in st.session_state:
+        st.session_state['send_button_clicked'] = False
+
+
 
     # get thread_id to start conversation
     user_id = st.session_state['user_id']
@@ -49,8 +53,9 @@ def report_test():
 
 
     if st.session_state['step_of_conversation'] < 4:
-        if st.button("Send"):
+        if st.button("Send", disabled=st.session_state['send_button_clicked']):
             if user_input:
+                st.session_state['send_button_clicked'] = True
                 st.session_state['step_of_conversation'] += 1
                 st.session_state.conversation.append(f"You: {user_input}")
                 response_to_input = requests.post(
@@ -70,6 +75,8 @@ def report_test():
                 print(f"Bot: {llm_response}', thread_id -> {thread_id}")
 
                 st.session_state.conversation.append(response)
+                
+                st.session_state['send_button_clicked'] = False
 
                 st.rerun()
     else:
