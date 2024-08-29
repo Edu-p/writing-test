@@ -24,11 +24,17 @@ db = client.WT_DB
 
 client_openai = OpenAI()
 
-# serve swagger ui
-SWAGGER_URL = '/swagger'
-API_URL = '/swagger.json'
-swaggerui_blueprint = get_swaggerui_blueprint(SWAGGER_URL, API_URL, config={'app_name': "Chat API"})
-app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+# health check route
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "ok"}), 200
+
+
+# # serve swagger ui
+# SWAGGER_URL = '/swagger'
+# API_URL = '/swagger.json'
+# swaggerui_blueprint = get_swaggerui_blueprint(SWAGGER_URL, API_URL, config={'app_name': "Chat API"})
+# app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 # helper functions 
 def get_completion_from_messages(messages, model='gpt-4o-mini'):
