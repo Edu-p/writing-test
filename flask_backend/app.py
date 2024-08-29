@@ -10,9 +10,7 @@ import logging
 import uuid
 import json
 import re
-
-
-
+import certifi
 
 load_dotenv()
 
@@ -22,7 +20,7 @@ CORS(app)
 # setup mongo and open ai api key
 MONGO_URI = os.getenv('MONGO_URI')
 os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
-client = MongoClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=True)
+client = MongoClient(MONGO_URI, tls=True, tlsCAFile=certifi.where())
 db = client.WT_DB
 
 client_openai = OpenAI()
