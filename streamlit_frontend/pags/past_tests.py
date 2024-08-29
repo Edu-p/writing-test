@@ -9,6 +9,10 @@ def show_import_tests():
 
     user_id = st.session_state['user_id']
 
+    if st.button("Previous"):
+        st.session_state['page'] = 'choose_wtd'
+        st.rerun()
+
     response = requests.post(
         # TODO: change when deploy
         url='http://localhost:5000/return_all_tests',

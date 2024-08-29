@@ -18,6 +18,8 @@ def report_test():
         st.session_state['step_of_conversation'] = 0
     if 'send_button_clicked' not in st.session_state:
         st.session_state['send_button_clicked'] = False
+    if 'user_input' not in st.session_state:
+        st.session_state['user_input'] = "" 
 
 
 
@@ -41,7 +43,7 @@ def report_test():
         thread_id = st.session_state['thread_id']
 
     if st.session_state['step_of_conversation'] == 0:
-        st.session_state.conversation.append("Bot: Hi! I'm your tech lead. Can you tell me what you did today?\n")
+        st.session_state.conversation.append("Bot: Hi! I'm your tech lead. Can you tell me what you did?\n")
         conversation_display = "\n".join(st.session_state.conversation)
         st.text_area("Conversation", conversation_display, height=300, disabled=True)
         st.session_state['step_of_conversation'] += 1
@@ -49,7 +51,7 @@ def report_test():
         conversation_display = "\n".join(st.session_state.conversation)
         st.text_area("Conversation", conversation_display, height=300, disabled=True)
 
-    user_input = st.text_input("Your message:")
+    user_input = st.text_input("Your message:", value=st.session_state['user_input'])
 
 
     if st.session_state['step_of_conversation'] < 4:
@@ -73,6 +75,8 @@ def report_test():
 
                 response = (f"Bot: {llm_response}\n")
                 print(f"Bot: {llm_response}', thread_id -> {thread_id}")
+                
+                st.session_state['user_input'] = "" 
 
                 st.session_state.conversation.append(response)
                 

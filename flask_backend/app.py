@@ -14,14 +14,13 @@ import re
 load_dotenv()
 
 app = Flask(__name__)
-
 CORS(app)
 
 # setup mongo and open ai api key
 MONGO_URI = os.getenv('MONGO_URI')
 os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
 client = MongoClient(MONGO_URI)
-db = client.myDatabase
+db = client.WT_DB
 
 client_openai = OpenAI()
 
@@ -50,7 +49,7 @@ def auth():
     password = data['password']
     
     user = db.Users.find_one({"email": email, "password": password})
-    
+
     if user:
         user_id = user["user_id"]
         return jsonify({"user_id": user_id}), 200

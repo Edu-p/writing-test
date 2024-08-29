@@ -73,7 +73,7 @@
               }
             }
           },
-          "400": {
+          "404": {
             "description": "Invalid credentials",
             "schema": {
               "type": "object",
@@ -353,7 +353,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "type": "object"
+                "type": "string"
               }
             }
           }
