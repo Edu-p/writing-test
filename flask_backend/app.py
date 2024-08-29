@@ -11,6 +11,9 @@ import uuid
 import json
 import re
 
+
+
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -242,4 +245,5 @@ def swagger_json():
     return send_from_directory('static', 'swagger.json')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
