@@ -22,7 +22,7 @@ CORS(app)
 # setup mongo and open ai api key
 MONGO_URI = os.getenv('MONGO_URI')
 os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
-client = MongoClient(MONGO_URI)
+client = MongoClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=True)
 db = client.WT_DB
 
 client_openai = OpenAI()
