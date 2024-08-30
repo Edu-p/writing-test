@@ -8,7 +8,7 @@ def view_overall_metrics():
 
     response_get_max_metric = requests.post(
             # TODO: change when deploy
-            url='http://localhost:5000/max_english_level',
+            url='https://writing-test-1c8k.onrender.com/max_english_level',
             json={
                 'user_id': user_id,
             }   
@@ -23,7 +23,7 @@ def view_overall_metrics():
         st.markdown(f"<h2 style='font-size:30px;'>To compute max level you need to do a test</h2>", unsafe_allow_html=True)
 
     st.write("")    
-    if st.button("Previous"):
+    if st.button("Back"):
         st.session_state['page'] = 'choose_wtd'
         st.rerun()
     st.write("")

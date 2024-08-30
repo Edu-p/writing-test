@@ -6,7 +6,7 @@ def explanation_of_test():
     # get explanation
     response = requests.post(
         # TODO: change when deploy
-        url='http://localhost:5000/explanations',
+        url='https://writing-test-1c8k.onrender.com/explanations',
         json={
             'type': 'report'
         }
@@ -26,7 +26,7 @@ def explanation_of_test():
             st.session_state['page'] = 'report_activity_2'
             st.rerun()
     with col5:
-        if st.button("Previous page"):
+        if st.button("Back"):
             st.session_state['page'] = 'choose_wtc'
             st.rerun()
 

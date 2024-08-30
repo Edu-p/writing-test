@@ -32,7 +32,7 @@ def report_test():
     else:   
         response_to_thread_id = requests.post(
             # TODO: change when deploy
-            url='http://localhost:5000/get_conversation',
+            url='https://writing-test-1c8k.onrender.com/get_conversation',
             json={
                 'user_id': user_id,
                 'type_of_test': 'report'   
@@ -62,7 +62,7 @@ def report_test():
                 st.session_state.conversation.append(f"You: {user_input}")
                 response_to_input = requests.post(
                     # TODO: change when deploy
-                    url='http://localhost:5000/chat',
+                    url='https://writing-test-1c8k.onrender.com/chat',
                     json={
                         'user_id': user_id,
                         'thread_id': thread_id,

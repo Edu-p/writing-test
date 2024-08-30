@@ -3,7 +3,7 @@ import streamlit as st
 def choose_what_type_of_chat():
     print('pass wtc')
 
-    if st.button("Previous"):
+    if st.button("Back"):
         st.session_state['page'] = 'choose_wtd'
         st.rerun()
         

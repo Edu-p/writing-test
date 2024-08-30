@@ -16,7 +16,7 @@ def show_auth_form():
         
         response = requests.post(
             # TODO: change when deploy
-            url='http://localhost:5000/auth',
+            url='https://writing-test-1c8k.onrender.com/auth',
             json={
                 'email': email, 
                 'password': password

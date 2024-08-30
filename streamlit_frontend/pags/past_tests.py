@@ -9,13 +9,13 @@ def show_import_tests():
 
     user_id = st.session_state['user_id']
 
-    if st.button("Previous"):
+    if st.button("Back"):
         st.session_state['page'] = 'choose_wtd'
         st.rerun()
 
     response = requests.post(
         # TODO: change when deploy
-        url='http://localhost:5000/return_all_tests',
+        url='https://writing-test-1c8k.onrender.com/return_all_tests',
         json={
             "user_id": user_id
         }

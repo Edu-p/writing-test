@@ -8,7 +8,7 @@ def show_conversation_summary():
     # get explanation
     response = requests.post(
         # TODO: change when deploy
-        url='http://localhost:5000/get_english_level',
+        url='https://writing-test-1c8k.onrender.com/get_english_level',
         json={
             "user_id": st.session_state['user_id'],
             "thread_id": st.session_state['thread_id']
