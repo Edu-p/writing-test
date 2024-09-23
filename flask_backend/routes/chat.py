@@ -1,7 +1,9 @@
-from flask import request, jsonify
-from . import chat_bp
-from app import db, client_openai
+from flask import request, jsonify, Blueprint
+from db import db
+from openai_client import client_openai
 from utils.helpers import get_completion_from_messages
+
+chat_bp = Blueprint('chat', __name__)
 
 @chat_bp.route('/chat', methods=['POST'])
 def chat_response():

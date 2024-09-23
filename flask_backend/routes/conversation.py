@@ -1,7 +1,8 @@
-from flask import request, jsonify
-from . import conversation_bp
-from app import db
+from flask import request, jsonify, Blueprint 
+from db import db
 import uuid
+
+conversation_bp = Blueprint('conversation', __name__)
 
 @conversation_bp.route('/get_conversation', methods=['POST'])
 def get_conversation():

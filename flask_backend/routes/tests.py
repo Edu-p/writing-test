@@ -1,6 +1,7 @@
-from flask import request, jsonify
-from . import tests_bp
-from app import db
+from flask import request, jsonify, Blueprint 
+from db import db
+
+tests_bp = Blueprint('tests', __name__)
 
 @tests_bp.route('/return_all_tests', methods=['POST'])
 def return_all_tests():

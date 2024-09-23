@@ -1,10 +1,12 @@
-from flask import Flask
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
 from pymongo import MongoClient
-from openai import OpenAI
+from openai_client import client_openai
 from dotenv import load_dotenv
 import os
+from db import db 
+
 
 load_dotenv()
 
@@ -15,9 +17,9 @@ CORS(app)
 MONGO_URI = os.getenv('MONGO_URI')
 os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
 client = MongoClient(MONGO_URI)
-db = client.WT_DB
+db = db
 
-client_openai = OpenAI()
+client_openai = client_openai
 
 # Register blueprints
 from routes.auth import auth_bp

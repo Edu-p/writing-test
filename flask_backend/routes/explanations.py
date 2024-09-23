@@ -1,6 +1,7 @@
-from flask import request, jsonify
-from . import explanations_bp
-from app import db
+from flask import request, jsonify, Blueprint
+from db import db
+
+explanations_bp = Blueprint('explanations', __name__)
 
 @explanations_bp.route('/explanations', methods=['POST'])
 def get_explanation():

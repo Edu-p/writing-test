@@ -1,6 +1,7 @@
-from flask import request, jsonify
-from . import auth_bp
-from app import db
+from flask import request, jsonify, Blueprint
+from db import db
+
+auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/auth', methods=['POST'])
 def auth():
