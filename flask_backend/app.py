@@ -28,6 +28,8 @@ from routes.chat import chat_bp
 from routes.conversation import conversation_bp
 from routes.english_level import english_level_bp
 from routes.tests import tests_bp
+from routes.store_cv import store_cv_bp
+
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(explanations_bp)
@@ -35,6 +37,7 @@ app.register_blueprint(chat_bp)
 app.register_blueprint(conversation_bp)
 app.register_blueprint(english_level_bp)
 app.register_blueprint(tests_bp)
+app.register_blueprint(store_cv_bp)
 
 # serve swagger ui
 SWAGGER_URL = '/swagger'

@@ -31,6 +31,10 @@
     {
       "name": "tests",
       "description": "Endpoints related to tests"
+    },
+    {
+      "name": "store_cv",
+      "description": "Endpoints related to storing CVs"
     }
   ],
   "schemes": [
@@ -354,6 +358,56 @@
               "type": "array",
               "items": {
                 "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/store_cv_db": {
+      "post": {
+        "tags": ["store_cv"],
+        "summary": "Store CV",
+        "description": "Store a CV in the database",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "CV details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
+                },
+                "pdf_base64": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF stored successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "PDF not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
               }
             }
           }
