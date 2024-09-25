@@ -47,6 +47,15 @@ def store_index(index, user_id, thread_id, index_type):
         # check if this acess is correct
         'documents': [{'text': node.metadata['original_text']} for node in index.docstore.docs.values()],
     }
+    db.QueryEngines.insert_one(index_data)
+
+def create_interview_questions_index():
+    documents = SimpleDirectoryReader(
+        input_files=["../utils/common_questions.txt"]
+    ).load_data()
+    nodes = node_parser.get_nodes_from_documents(documents)
+    index = VectorStoreIndex(nodes)
+    return index
 
 interview_bp = Blueprint('interview', __name__)
 
@@ -70,6 +79,12 @@ def interview_chat_gen():
 
         if interview_index_data:
             interview_index = reconstruct_index(interview_index_data)
-            store_index(interview_index, user_id, thread_id, 'interview_questions')
+            
+        else:
+            interview_index = create_interview_questions_index()
+            store_index(interview_index, user_id, thread_id, 'interview_questions') 
+
+        
+
 
     except:
