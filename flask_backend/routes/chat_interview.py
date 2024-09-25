@@ -16,6 +16,38 @@ from llama_index.llms.openai.base import OpenAI
 
 from llama_index.embeddings.openai import OpenAIEmbedding
 
+# basic llm setup 
+llm = OpenAI(model='gpt-4')
+embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+
+
+Settings.llm = llm
+Settings.embed_model = embed_model
+
+# node parser(sentence window approach)
+node_parser = SentenceWindowNodeParser.from_defaults(
+    window_size=3,
+    window_metadata_key='window',
+    original_text_metadata_key='original_text',
+)
+
+# helper functions 
+
+def reconstruct_index(index_data):
+    documents = [Document(text=doc['text']) for doc in index_data['documents']]
+    nodes = node_parser.get_nodes_from_documents(documents)
+    index = VectorStoreIndex(nodes)
+    return index
+
+def store_index(index, user_id, thread_id, index_type):
+    index_data = {
+        'user_id': user_id,
+        'thread_id': thread_id,
+        'type': index_type,
+        # check if this acess is correct
+        'documents': [{'text': node.metadata['original_text']} for node in index.docstore.docs.values()],
+    }
+
 interview_bp = Blueprint('interview', __name__)
 
 @interview_bp.route('/interview_chat', methods=['POST'])
@@ -24,19 +56,20 @@ def interview_chat_gen():
     user_id = data['user_id']
     thread_id = data['thread_id']
     content = data['content']
-
-
-    # basic llm setup 
-    llm = OpenAI(model='gpt-4')
-    embed_model = OpenAIEmbedding(model="text-embedding-3-small")
     
+    if not all([data, user_id, content]):
+        return jsonify({"error": "Missing required fields"}), 400
     
-    Settings.llm = llm
-    Settings.embed_model = embed_model
+    try:
+        # interview question index
+        interview_index_data = db.QueryEngines.find_one({
+            'user_id': user_id,
+            'thread_id': thread_id,
+            'type': 'interview_questions'
+        })
 
-    # node parser(sentence window approach)
-    node_parser = SentenceWindowNodeParser.from_defaults(
-        window_size = 3,
-        window_metadata_key='window',
-        original_text_metadata_key='original_text',
-    )
+        if interview_index_data:
+            interview_index = reconstruct_index(interview_index_data)
+            store_index(interview_index, user_id, thread_id, 'interview_questions')
+
+    except:
