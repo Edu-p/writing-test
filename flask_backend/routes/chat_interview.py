@@ -14,6 +14,8 @@ from llama_index.llms.openai.base import OpenAI
 
 from llama_index.embeddings.openai import OpenAIEmbedding
 
+import pymongo
+
 # basic llm setup 
 llm = OpenAI(model='gpt-4')
 embed_model = OpenAIEmbedding(model="text-embedding-3-small")
@@ -34,11 +36,7 @@ def reconstruct_index(index_data):
     documents = [Document(text=doc['text']) for doc in index_data['documents']]
     nodes = node_parser.get_nodes_from_documents(documents)
     index = VectorStoreIndex(nodes)
-    query_engine = index.as_query_engine(
-        similarity_top_k = 6,
-        node_postprocessor = [MetadataReplacementPostProcessor(target_metadata_key='window')],
-    )
-    return query_engine
+    return index
 
 def store_index(index, user_id, thread_id, index_type):
     index_data = {
@@ -57,22 +55,14 @@ def create_interview_questions_index():
     ).load_data()
     nodes = node_parser.get_nodes_from_documents(documents)
     index = VectorStoreIndex(nodes)
-    query_engine = index.as_query_engine(
-        similarity_top_k = 6,
-        node_postprocessor = [MetadataReplacementPostProcessor(target_metadata_key='window')],
-    )
-    return query_engine
+    return index
 
 def create_cv_index(user_id):
     cv_data = db.CVs.find_one({'user_id': user_id})
     document = Document(text=cv_data['pdf_text'])
     nodes = node_parser.get_nodes_from_documents([document])
     index = VectorStoreIndex(nodes)
-    query_engine = index.as_query_engine(
-        similarity_top_k = 6,
-        node_postprocessor = [MetadataReplacementPostProcessor(target_metadata_key='window')],
-    )
-    return query_engine
+    return index 
 
 def generate_final_message(best_question, best_context, content, messages):
     prompt = f"""
@@ -93,6 +83,8 @@ def generate_final_message(best_question, best_context, content, messages):
 
     response = get_completion_from_messages(messages)
 
+    return response
+
 interview_bp = Blueprint('interview', __name__)
 
 @interview_bp.route('/interview_chat', methods=['POST'])
@@ -104,7 +96,7 @@ def interview_chat_gen():
     
     if not all([data, user_id, content]):
         return jsonify({"error": "Missing required fields"}), 400
-    
+
     try:
         # interview question index
         interview_index_data = db.QueryEngines.find_one({
@@ -115,11 +107,11 @@ def interview_chat_gen():
 
         if interview_index_data:
             interview_index = reconstruct_index(interview_index_data)
-            
+
         else:
             interview_index = create_interview_questions_index()
             store_index(interview_index, user_id, thread_id, 'interview_questions') 
-        
+
         cv_index_data = db.QueryEngines.find_one({
             'user_id': user_id,
             'thread_id': thread_id,
@@ -134,14 +126,20 @@ def interview_chat_gen():
         conversations = db.Conversations.find({"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
         messages = [{"role": conv["role"], "content": conv["content"]} for conv in conversations]
 
-        best_question_response = interview_index.query(content)
+        best_question_response = interview_index.as_query_engine(
+                similarity_top_k = 6,
+                node_postprocessor = [MetadataReplacementPostProcessor(target_metadata_key='window')]
+        ).query(content)
         best_question = str(best_question_response)
 
-        best_context_response = cv_index.query(content)
+        best_context_response = cv_index.as_query_engine(
+                similarity_top_k = 6,
+                node_postprocessor = [MetadataReplacementPostProcessor(target_metadata_key='window')]
+        ).query(content)
         best_context = str(best_context_response)
 
         final_message_from_llm = generate_final_message(
-            best_question, best_context, content
+            best_question, best_context, content, messages
         )
 
         db.Conversations.insert_many([
