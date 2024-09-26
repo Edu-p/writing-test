@@ -51,11 +51,39 @@ def store_index(index, user_id, thread_id, index_type):
 
 def create_interview_questions_index():
     documents = SimpleDirectoryReader(
+        # non-unix based path 
         input_files=["../utils/common_questions.txt"]
     ).load_data()
     nodes = node_parser.get_nodes_from_documents(documents)
     index = VectorStoreIndex(nodes)
+    # does not need .asqueryengine?
     return index
+
+def create_cv_index(user_id):
+    cv_data = db.CVs.find_one({'user_id': user_id})
+    document = Document(text=cv_data['pdf_text'])
+    nodes = node_parser.get_nodes_from_documents([document])
+    index = VectorStoreIndex(nodes)
+    return index
+
+def generate_final_message(best_question, best_context, content, messages):
+    prompt = f"""
+        You are a virtual interviewer simulating a technical interview.
+
+        User's last message:
+        {content}
+
+        Based on the best question:
+        {best_question}
+
+        And the best context from the user's CV:
+        {best_context}
+
+        Generate a brief discussion about what was talked about, and then present the next question(try to incorporate the context from the CV).
+    """
+    messages.append({"role": "user", "content": prompt})
+
+    response = get_completion_from_messages(messages)
 
 interview_bp = Blueprint('interview', __name__)
 
@@ -83,8 +111,48 @@ def interview_chat_gen():
         else:
             interview_index = create_interview_questions_index()
             store_index(interview_index, user_id, thread_id, 'interview_questions') 
-
         
+        cv_index_data = db.QueryEngines.find_one({
+            'user_id': user_id,
+            'thread_id': thread_id,
+            'type': 'user_cv'
+        })
+
+        if cv_index_data:
+            cv_index = reconstruct_index(cv_index_data)
+        else:  
+            cv_index = create_cv_index(user_id)
+
+        conversations = db.Conversations.find({"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
+        messages = [{"role": conv["role"], "content": conv["content"]} for conv in conversations]
+
+        best_question_response = interview_index.query(content)
+        best_question = str(best_question_response)
+
+        best_context_response = cv_index.query(content)
+        best_context = str(best_context_response)
+
+        final_message_from_llm = generate_final_message(
+            best_question, best_context, content 
+        )
+
+        db.Conversations.insert_many([
+        {
+            "thread_id": thread_id,
+            "user_id": user_id,
+            "role": "user",
+            "content": content
+        },
+        {
+            "thread_id": thread_id,
+            "user_id": user_id,
+            "role": "assistant",
+            "content": final_message_from_llm
+        }
+        ])
+
+        return jsonify({'response': final_message_from_llm})
 
 
-    except:
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
