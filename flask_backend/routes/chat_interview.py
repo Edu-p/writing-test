@@ -37,7 +37,11 @@ def reconstruct_index(index_data):
     documents = [Document(text=doc['text']) for doc in index_data['documents']]
     nodes = node_parser.get_nodes_from_documents(documents)
     index = VectorStoreIndex(nodes)
-    return index
+    query_engine = index.as_query_engine(
+        similarity_top_k = 6,
+        node_postprocessor = [MetadataReplacementPostProcessor(target_metadata_key='window')],
+    )
+    return query_engine
 
 def store_index(index, user_id, thread_id, index_type):
     index_data = {
@@ -56,15 +60,22 @@ def create_interview_questions_index():
     ).load_data()
     nodes = node_parser.get_nodes_from_documents(documents)
     index = VectorStoreIndex(nodes)
-    # does not need .asqueryengine?
-    return index
+    query_engine = index.as_query_engine(
+        similarity_top_k = 6,
+        node_postprocessor = [MetadataReplacementPostProcessor(target_metadata_key='window')],
+    )
+    return query_engine
 
 def create_cv_index(user_id):
     cv_data = db.CVs.find_one({'user_id': user_id})
     document = Document(text=cv_data['pdf_text'])
     nodes = node_parser.get_nodes_from_documents([document])
     index = VectorStoreIndex(nodes)
-    return index
+    query_engine = index.as_query_engine(
+        similarity_top_k = 6,
+        node_postprocessor = [MetadataReplacementPostProcessor(target_metadata_key='window')],
+    )
+    return query_engine
 
 def generate_final_message(best_question, best_context, content, messages):
     prompt = f"""
