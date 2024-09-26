@@ -3,6 +3,8 @@ from db import db
 from openai_client import client_openai
 from utils.helpers import get_completion_from_messages
 
+import pymongo
+
 chat_bp = Blueprint('chat', __name__)
 
 @chat_bp.route('/chat', methods=['POST'])

@@ -3,6 +3,7 @@ from db import db
 from utils.helpers import get_completion_from_messages
 import re
 import json
+import pymongo
 
 english_level_bp = Blueprint('english_level', __name__)
 
