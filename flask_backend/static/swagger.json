@@ -35,6 +35,10 @@
     {
       "name": "store_cv",
       "description": "Endpoints related to storing CVs"
+    },
+    {
+      "name": "interview_chat",
+      "description": "chat related to interview"
     }
   ],
   "schemes": [
@@ -390,7 +394,7 @@
         ],
         "responses": {
           "200": {
-            "description": "PDF stored successfully",
+            "description": "PDF text stored successfully",
             "schema": {
               "type": "object",
               "properties": {
@@ -402,6 +406,81 @@
           },
           "404": {
             "description": "PDF not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview_chat": {
+      "post": {
+        "tags": ["interview_chat"],
+        "summary": "Generate interview chat response",
+        "description": "Generate interview chat based on user input",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Interview chat details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
+                },
+                "thread_id": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful interview chat response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "response": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
             "schema": {
               "type": "object",
               "properties": {

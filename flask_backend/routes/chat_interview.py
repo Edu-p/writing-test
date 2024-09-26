@@ -2,13 +2,11 @@ from flask import request, jsonify, Blueprint
 from db import db
 from openai_client import client_openai
 from utils.helpers import get_completion_from_messages
-from llama_index import (
-    VectorStoreIndex,
-    SimpleDirectoryReader,
-    Document,
-    SentenceWindowNodeParser,
-    MetadataReplacementPostProcessor
-)
+from llama_index.core.indices.vector_store import VectorStoreIndex
+from llama_index.core.readers.file.base import SimpleDirectoryReader
+from llama_index.core import Document
+from llama_index.core.node_parser.text.sentence_window import SentenceWindowNodeParser
+from llama_index.core.postprocessor import MetadataReplacementPostProcessor
 
 from llama_index.core import Settings
 
@@ -32,7 +30,6 @@ node_parser = SentenceWindowNodeParser.from_defaults(
 )
 
 # helper functions 
-
 def reconstruct_index(index_data):
     documents = [Document(text=doc['text']) for doc in index_data['documents']]
     nodes = node_parser.get_nodes_from_documents(documents)
@@ -56,7 +53,7 @@ def store_index(index, user_id, thread_id, index_type):
 def create_interview_questions_index():
     documents = SimpleDirectoryReader(
         # non-unix based path 
-        input_files=["../utils/common_questions.txt"]
+        input_files=["./utils/common_questions.txt"]
     ).load_data()
     nodes = node_parser.get_nodes_from_documents(documents)
     index = VectorStoreIndex(nodes)
@@ -144,7 +141,7 @@ def interview_chat_gen():
         best_context = str(best_context_response)
 
         final_message_from_llm = generate_final_message(
-            best_question, best_context, content 
+            best_question, best_context, content
         )
 
         db.Conversations.insert_many([
