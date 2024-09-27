@@ -16,10 +16,9 @@ from llama_index.embeddings.openai import OpenAIEmbedding
 
 import pymongo
 
-# basic llm setup 
+# basic llm setup
 llm = OpenAI(model='gpt-4')
 embed_model = OpenAIEmbedding(model="text-embedding-3-small")
-
 
 Settings.llm = llm
 Settings.embed_model = embed_model
@@ -31,12 +30,15 @@ node_parser = SentenceWindowNodeParser.from_defaults(
     original_text_metadata_key='original_text',
 )
 
-# helper functions 
+# helper functions
+
+
 def reconstruct_index(index_data):
     documents = [Document(text=doc['text']) for doc in index_data['documents']]
     nodes = node_parser.get_nodes_from_documents(documents)
     index = VectorStoreIndex(nodes)
     return index
+
 
 def store_index(index, user_id, thread_id, index_type):
     index_data = {
@@ -48,21 +50,24 @@ def store_index(index, user_id, thread_id, index_type):
     }
     db.QueryEngines.insert_one(index_data)
 
+
 def create_interview_questions_index():
     documents = SimpleDirectoryReader(
-        # non-unix based path 
+        # non-unix based path
         input_files=["./utils/common_questions.txt"]
     ).load_data()
     nodes = node_parser.get_nodes_from_documents(documents)
     index = VectorStoreIndex(nodes)
     return index
 
+
 def create_cv_index(user_id):
     cv_data = db.CVs.find_one({'user_id': user_id})
     document = Document(text=cv_data['pdf_text'])
     nodes = node_parser.get_nodes_from_documents([document])
     index = VectorStoreIndex(nodes)
-    return index 
+    return index
+
 
 def generate_final_message(best_question, best_context, content, messages):
     prompt = f"""
@@ -85,7 +90,9 @@ def generate_final_message(best_question, best_context, content, messages):
 
     return response
 
+
 interview_bp = Blueprint('interview', __name__)
+
 
 @interview_bp.route('/interview_chat', methods=['POST'])
 def interview_chat_gen():
@@ -93,7 +100,7 @@ def interview_chat_gen():
     user_id = data['user_id']
     thread_id = data['thread_id']
     content = data['content']
-    
+
     if not all([data, user_id, content]):
         return jsonify({"error": "Missing required fields"}), 400
 
@@ -110,7 +117,8 @@ def interview_chat_gen():
 
         else:
             interview_index = create_interview_questions_index()
-            store_index(interview_index, user_id, thread_id, 'interview_questions') 
+            store_index(interview_index, user_id,
+                        thread_id, 'interview_questions')
 
         cv_index_data = db.QueryEngines.find_one({
             'user_id': user_id,
@@ -120,21 +128,25 @@ def interview_chat_gen():
 
         if cv_index_data:
             cv_index = reconstruct_index(cv_index_data)
-        else:  
+        else:
             cv_index = create_cv_index(user_id)
 
-        conversations = db.Conversations.find({"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
-        messages = [{"role": conv["role"], "content": conv["content"]} for conv in conversations]
+        conversations = db.Conversations.find(
+            {"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
+        messages = [{"role": conv["role"], "content": conv["content"]}
+                    for conv in conversations]
 
         best_question_response = interview_index.as_query_engine(
-                similarity_top_k = 6,
-                node_postprocessor = [MetadataReplacementPostProcessor(target_metadata_key='window')]
+            similarity_top_k=6,
+            node_postprocessor=[MetadataReplacementPostProcessor(
+                target_metadata_key='window')]
         ).query(content)
         best_question = str(best_question_response)
 
         best_context_response = cv_index.as_query_engine(
-                similarity_top_k = 6,
-                node_postprocessor = [MetadataReplacementPostProcessor(target_metadata_key='window')]
+            similarity_top_k=6,
+            node_postprocessor=[MetadataReplacementPostProcessor(
+                target_metadata_key='window')]
         ).query(content)
         best_context = str(best_context_response)
 
@@ -143,22 +155,21 @@ def interview_chat_gen():
         )
 
         db.Conversations.insert_many([
-        {
-            "thread_id": thread_id,
-            "user_id": user_id,
-            "role": "user",
-            "content": content
-        },
-        {
-            "thread_id": thread_id,
-            "user_id": user_id,
-            "role": "assistant",
-            "content": final_message_from_llm
-        }
+            {
+                "thread_id": thread_id,
+                "user_id": user_id,
+                "role": "user",
+                "content": content
+            },
+            {
+                "thread_id": thread_id,
+                "user_id": user_id,
+                "role": "assistant",
+                "content": final_message_from_llm
+            }
         ])
 
         return jsonify({'response': final_message_from_llm})
-
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500

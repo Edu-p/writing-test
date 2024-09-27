@@ -3,6 +3,7 @@ from db import db
 
 explanations_bp = Blueprint('explanations', __name__)
 
+
 @explanations_bp.route('/explanations', methods=['POST'])
 def get_explanation():
     data = request.get_json()

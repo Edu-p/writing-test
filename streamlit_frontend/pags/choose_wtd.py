@@ -1,9 +1,10 @@
 import streamlit as st
 
+
 def choose_what_to_do():
     print(st.session_state)
     print('pass wtd')
-    
+
     st.markdown(
         """
         <style>
@@ -24,7 +25,7 @@ def choose_what_to_do():
         """,
         unsafe_allow_html=True
     )
-    
+
     with st.container():
         st.title("What do you want to do?")
         st.subheader("")
@@ -37,7 +38,7 @@ def choose_what_to_do():
                 st.session_state['page'] = 'choose_wtc'
 
                 st.rerun()
-        
+
         with col4:
             if st.button("View your metrics"):
                 st.session_state['page'] = 'view_overall'

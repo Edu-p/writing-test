@@ -1,12 +1,13 @@
 import streamlit as st
 
+
 def choose_what_type_of_chat():
     print('pass wtc')
 
     if st.button("Back"):
         st.session_state['page'] = 'choose_wtd'
         st.rerun()
-        
+
     st.title("")
     st.subheader("")
 
@@ -24,8 +25,6 @@ def choose_what_type_of_chat():
         unsafe_allow_html=True
     )
 
-
-    
     with st.container():
         st.title("Choose what type of situation you want to be tested")
         st.subheader("")
@@ -35,5 +34,5 @@ def choose_what_type_of_chat():
             st.session_state['page'] = 'report_activity_1'
 
             st.rerun()
-        
+
         st.markdown('</div>', unsafe_allow_html=True)

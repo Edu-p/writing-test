@@ -1,8 +1,9 @@
-from flask import request, jsonify, Blueprint 
+from flask import request, jsonify, Blueprint
 from db import db
 import uuid
 
 conversation_bp = Blueprint('conversation', __name__)
+
 
 @conversation_bp.route('/get_conversation', methods=['POST'])
 def get_conversation():
@@ -17,14 +18,14 @@ def get_conversation():
             You are a tech lead. The purpose of this conversation is to collect a detailed report from your software engineer. Think about the better type of question that you can ask to gather comprehensive information about their activities, progress, challenges, and any support they might need. \
             Please, be short as possible on your responses.
         """
-        
+
         db.Conversations.insert_one({
             "thread_id": thread_id,
             "user_id": user_id,
             "role": "system",
             "content": prompt
         })
-    else:   
+    else:
         return jsonify({"error": "Type of test not found"})
 
     return jsonify({"thread_id": thread_id})

@@ -1,6 +1,7 @@
 import streamlit as st
-import requests 
+import requests
 import time
+
 
 def show_import_tests():
     st.title("")
@@ -19,7 +20,7 @@ def show_import_tests():
         json={
             "user_id": user_id
         }
-    ) 
+    )
     if response.status_code == 200:
         data = response.json()
         attempts = data

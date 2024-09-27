@@ -7,6 +7,7 @@ import pymongo
 
 chat_bp = Blueprint('chat', __name__)
 
+
 @chat_bp.route('/chat', methods=['POST'])
 def chat_response():
     data = request.get_json()
@@ -14,8 +15,10 @@ def chat_response():
     thread_id = data['thread_id']
     content = data['content']
 
-    conversations = db.Conversations.find({"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
-    messages = [{"role": conv["role"], "content": conv["content"]} for conv in conversations]
+    conversations = db.Conversations.find(
+        {"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
+    messages = [{"role": conv["role"], "content": conv["content"]}
+                for conv in conversations]
 
     messages.append({"role": "user", "content": content})
 

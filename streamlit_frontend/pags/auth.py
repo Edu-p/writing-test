@@ -1,6 +1,7 @@
 import streamlit as st
-import requests 
+import requests
 import time
+
 
 def show_auth_form():
     st.title("Welcome to Writing Test Platform")
@@ -13,16 +14,16 @@ def show_auth_form():
 
     if submit_button:
         st.write("Authenticating...")
-        
+
         response = requests.post(
             # TODO: change when deploy
             url='https://writing-test-1c8k.onrender.com/auth',
             json={
-                'email': email, 
+                'email': email,
                 'password': password
             }
         )
-    
+
         if response.status_code == 200:
             data = response.json()
             st.session_state['user_id'] = data['user_id']
@@ -33,6 +34,6 @@ def show_auth_form():
             time.sleep(2)
 
             st.rerun()
-        
+
         else:
             st.error("Login failed.")

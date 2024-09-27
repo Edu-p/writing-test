@@ -9,7 +9,8 @@ from pags.view_metrics import view_overall_metrics
 from pags.past_tests import show_import_tests
 
 
-st.set_page_config(page_title="Writing Test Platform", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Writing Test Platform",
+                   layout="centered", initial_sidebar_state="collapsed")
 
 if 'page' not in st.session_state:
     st.session_state['page'] = 'auth'

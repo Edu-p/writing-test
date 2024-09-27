@@ -1,6 +1,7 @@
 import streamlit as st
-import requests 
+import requests
 import time
+
 
 def explanation_of_test():
     # get explanation
@@ -10,15 +11,15 @@ def explanation_of_test():
         json={
             'type': 'report'
         }
-    ) 
+    )
     if response.status_code == 200:
         data = response.json()
-        # display the main button 
+        # display the main button
         text_of_explanation = data['explanation']
         st.text_area("", text_of_explanation, height=150)
     else:
         st.error("Problem in request.")
-    
+
     col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
@@ -29,13 +30,3 @@ def explanation_of_test():
         if st.button("Back"):
             st.session_state['page'] = 'choose_wtc'
             st.rerun()
-
-
-
-
-
-
-
-
-
-

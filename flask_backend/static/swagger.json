@@ -41,9 +41,7 @@
       "description": "chat related to interview"
     }
   ],
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "paths": {
     "/auth": {
       "post": {

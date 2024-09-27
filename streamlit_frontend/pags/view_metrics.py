@@ -1,28 +1,31 @@
 import streamlit as st
 import requests
 
+
 def view_overall_metrics():
     st.title('')
 
     user_id = st.session_state['user_id']
 
     response_get_max_metric = requests.post(
-            # TODO: change when deploy
-            url='https://writing-test-1c8k.onrender.com/max_english_level',
-            json={
-                'user_id': user_id,
-            }   
+        # TODO: change when deploy
+        url='https://writing-test-1c8k.onrender.com/max_english_level',
+        json={
+            'user_id': user_id,
+        }
     )
     if response_get_max_metric.status_code == 200:
         data = response_get_max_metric.json()
 
         max_cepr = data['max_cepr']
 
-        st.markdown(f"<h2 style='font-size:30px;'>Max level: {max_cepr}</h2>", unsafe_allow_html=True)
+        st.markdown(
+            f"<h2 style='font-size:30px;'>Max level: {max_cepr}</h2>", unsafe_allow_html=True)
     else:
-        st.markdown(f"<h2 style='font-size:30px;'>To compute max level you need to do a test</h2>", unsafe_allow_html=True)
+        st.markdown(
+            f"<h2 style='font-size:30px;'>To compute max level you need to do a test</h2>", unsafe_allow_html=True)
 
-    st.write("")    
+    st.write("")
     if st.button("Back"):
         st.session_state['page'] = 'choose_wtd'
         st.rerun()

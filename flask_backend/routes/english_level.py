@@ -7,19 +7,23 @@ import pymongo
 
 english_level_bp = Blueprint('english_level', __name__)
 
+
 @english_level_bp.route('/get_english_level', methods=['POST'])
 def get_english_level():
     data = request.get_json()
     user_id = data['user_id']
     thread_id = data['thread_id']
-    
-    already_computed = db.EnglishLevel.find_one({"thread_id": thread_id, "user_id": user_id})
+
+    already_computed = db.EnglishLevel.find_one(
+        {"thread_id": thread_id, "user_id": user_id})
     if already_computed:
         return jsonify({"level": already_computed['level'], "CEPR": already_computed['CEPR']})
     else:
-        conversations = db.Conversations.find({"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
-        messages = [{"role": conv["role"], "content": conv["content"]} for conv in conversations]
-        
+        conversations = db.Conversations.find(
+            {"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
+        messages = [{"role": conv["role"], "content": conv["content"]}
+                    for conv in conversations]
+
         prompt_english_level = """
             Identify the items based on previous conversation:
                 - Level of english(0% min and 100% max)
@@ -36,7 +40,8 @@ def get_english_level():
 
         response = get_completion_from_messages(messages)
 
-        match = re.search(r'\{\s*"level"\s*:\s*\d+\s*,\s*"CEPR"\s*:\s*"[A-Z0-9]+"\s*\}', response, re.DOTALL)
+        match = re.search(
+            r'\{\s*"level"\s*:\s*\d+\s*,\s*"CEPR"\s*:\s*"[A-Z0-9]+"\s*\}', response, re.DOTALL)
 
         if match:
             response_json = match.group(0)
@@ -44,7 +49,7 @@ def get_english_level():
             return jsonify({"error": "Failed to extract JSON from response"}), 500
 
         response_dict = json.loads(response_json)
-        
+
         db.EnglishLevel.insert_one({
             "thread_id": thread_id,
             "user_id": user_id,
@@ -54,12 +59,14 @@ def get_english_level():
 
         return jsonify(response_dict)
 
+
 @english_level_bp.route('/max_english_level', methods=['POST'])
 def max_english_level():
     data = request.get_json()
     user_id = data['user_id']
 
-    levels_of_user = db.EnglishLevel.find({"user_id": user_id}).sort("_id", pymongo.ASCENDING)
+    levels_of_user = db.EnglishLevel.find(
+        {"user_id": user_id}).sort("_id", pymongo.ASCENDING)
 
     cepr_order = ["A1", "A2", "B1", "B2", "C1", "C2"]
 
