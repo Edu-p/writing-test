@@ -1,6 +1,10 @@
 import streamlit as st
 import requests
 import time
+import os
+from dotenv import load_dotenv
+
+BASE_URL = os.getenv('BASE_URL')
 
 
 def show_conversation_summary():
@@ -8,8 +12,7 @@ def show_conversation_summary():
     st.subheader("")
     # get explanation
     response = requests.post(
-        # TODO: change when deploy
-        url='https://writing-test-1c8k.onrender.com/get_english_level',
+        url=f'{BASE_URL}/get_english_level',
         json={
             "user_id": st.session_state['user_id'],
             "thread_id": st.session_state['thread_id']

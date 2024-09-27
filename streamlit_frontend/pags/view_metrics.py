@@ -1,5 +1,9 @@
 import streamlit as st
 import requests
+import os
+from dotenv import load_dotenv
+
+BASE_URL = os.getenv('BASE_URL')
 
 
 def view_overall_metrics():
@@ -7,9 +11,9 @@ def view_overall_metrics():
 
     user_id = st.session_state['user_id']
 
-    response_get_max_metric = requests.post(
+    response_get_max_metric = requests.postf(
         # TODO: change when deploy
-        url='https://writing-test-1c8k.onrender.com/max_english_level',
+        url=f'{BASE_URL}/max_english_level',
         json={
             'user_id': user_id,
         }

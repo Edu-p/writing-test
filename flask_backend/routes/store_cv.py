@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint
-from db import db 
+from db import db
 import PyPDF2
 from io import BytesIO
 import base64
@@ -7,8 +7,9 @@ from PyPDF2 import PdfReader
 
 store_cv_bp = Blueprint('store_cv', __name__)
 
+
 @store_cv_bp.route('/store_cv_db', methods=['POST'])
-def store_cv_db(): 
+def store_cv_db():
     data = request.get_json()
     user_id = data['user_id']
     pdf_base64 = data['pdf_base64']
@@ -33,9 +34,3 @@ def store_cv_db():
     })
 
     return jsonify({"message": "PDF text stored"}), 200
-
-
-
-
-
-

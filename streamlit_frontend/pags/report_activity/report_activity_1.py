@@ -1,13 +1,17 @@
 import streamlit as st
 import requests
 import time
+import os
+from dotenv import load_dotenv
+
+BASE_URL = os.getenv('BASE_URL')
 
 
 def explanation_of_test():
     # get explanation
     response = requests.post(
         # TODO: change when deploy
-        url='https://writing-test-1c8k.onrender.com/explanations',
+        url=f'{BASE_URL}/explanations',
         json={
             'type': 'report'
         }

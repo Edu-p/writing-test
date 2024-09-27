@@ -1,12 +1,13 @@
 import streamlit as st
 import requests
 import time
+import os
+from dotenv import load_dotenv
 
+BASE_URL = os.getenv('BASE_URL')
 
 def report_test():
     st.title("Chatbot Conversation")
-
-    print('pass report 2')
 
     # verifications in session state
     if 'user_id' not in st.session_state:
@@ -31,7 +32,7 @@ def report_test():
     else:
         response_to_thread_id = requests.post(
             # TODO: change when deploy
-            url='https://writing-test-1c8k.onrender.com/get_conversation',
+            url=f'{BASE_URL}/get_conversation',
             json={
                 'user_id': user_id,
                 'type_of_test': 'report'

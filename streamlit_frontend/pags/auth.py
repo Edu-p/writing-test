@@ -1,6 +1,10 @@
 import streamlit as st
 import requests
 import time
+import os
+from dotenv import load_dotenv
+
+BASE_URL = os.getenv('BASE_URL')
 
 
 def show_auth_form():
@@ -17,7 +21,7 @@ def show_auth_form():
 
         response = requests.post(
             # TODO: change when deploy
-            url='https://writing-test-1c8k.onrender.com/auth',
+            url=f'{BASE_URL}/auth',
             json={
                 'email': email,
                 'password': password

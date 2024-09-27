@@ -1,6 +1,10 @@
 import streamlit as st
 import requests
 import time
+import os
+from dotenv import load_dotenv
+
+BASE_URL = os.getenv('BASE_URL')
 
 
 def show_import_tests():
@@ -16,7 +20,7 @@ def show_import_tests():
 
     response = requests.post(
         # TODO: change when deploy
-        url='https://writing-test-1c8k.onrender.com/return_all_tests',
+        url=f'{BASE_URL}/return_all_tests',
         json={
             "user_id": user_id
         }
