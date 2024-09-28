@@ -4,6 +4,10 @@ import time
 import os
 from dotenv import load_dotenv
 
+os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+load_dotenv()
+
 BASE_URL = os.getenv('BASE_URL')
 
 
@@ -18,10 +22,10 @@ def show_auth_form():
 
     if submit_button:
         st.write("Authenticating...")
-
+        print(f"{BASE_URL}/auth")
         response = requests.post(
             # TODO: change when deploy
-            url=f'{BASE_URL}/auth',
+            url=f"{BASE_URL}/auth",
             json={
                 'email': email,
                 'password': password
