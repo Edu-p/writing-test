@@ -7,6 +7,7 @@ from pags.report_activity.report_activity_2 import report_test
 from pags.report_activity.report_activity_3 import show_conversation_summary
 from pags.view_metrics import view_overall_metrics
 from pags.past_tests import show_import_tests
+from pags.interview.interview_1 import explanation_of_test_interview
 
 
 st.set_page_config(page_title="Writing Test Platform",
@@ -30,6 +31,10 @@ elif st.session_state['page'] == 'report_activity_2':
     report_test()
 elif st.session_state['page'] == 'report_activity_3':
     show_conversation_summary()
+
+# flux interview
+elif st.session_state['page'] == 'interview_1':
+    explanation_of_test_interview()
 
 # flux see metrics
 elif st.session_state['page'] == 'view_overall':
