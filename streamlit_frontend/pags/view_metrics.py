@@ -3,7 +3,7 @@ import requests
 import os
 from dotenv import load_dotenv
 
-os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 load_dotenv()
 
@@ -15,8 +15,7 @@ def view_overall_metrics():
 
     user_id = st.session_state['user_id']
 
-    response_get_max_metric = requests.postf(
-        # TODO: change when deploy
+    response_get_max_metric = requests.post(
         url=f'{BASE_URL}/max_english_level',
         json={
             'user_id': user_id,
