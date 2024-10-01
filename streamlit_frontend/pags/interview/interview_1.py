@@ -27,7 +27,7 @@ def explanation_of_test_interview():
     else:
         st.error('Problem in request')
 
-    uploaded_file = st.file_uploader('Upload your CV ot continue', type="pdf")
+    uploaded_file = st.file_uploader('Upload your CV to continue', type="pdf")
 
     if uploaded_file is not None:
         pdf_bytes = uploaded_file.read()
@@ -51,7 +51,7 @@ def explanation_of_test_interview():
     with col1:
         if st.button("Do the test"):
             if uploaded_file is not None:
-                st.session_state['page'] = 'report_activity_2'
+                st.session_state['page'] = 'interview_2'
                 st.rerun()
             else:
                 st.error("Please upload your CV")

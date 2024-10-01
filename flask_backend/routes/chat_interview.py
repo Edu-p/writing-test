@@ -82,7 +82,7 @@ def generate_final_message(best_question, best_context, content, messages):
         And the best context from the user's CV:
         {best_context}
 
-        Generate a brief discussion about what was talked about, and then present the next question(try to incorporate the context from the CV).
+        Generate a brief discussion about what was talked about, and then present the next question(best question) and you need to incorporate the context from the CV in the question.
     """
     messages.append({"role": "user", "content": prompt})
 

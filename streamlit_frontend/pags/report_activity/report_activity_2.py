@@ -10,8 +10,9 @@ load_dotenv()
 
 BASE_URL = os.getenv('BASE_URL')
 
+
 def report_test():
-    st.title("Chatbot Conversation")
+    st.title("Chatbot Conversation - Report Test")
 
     # verifications in session state
     if 'user_id' not in st.session_state:
@@ -69,7 +70,7 @@ def report_test():
                 st.session_state.conversation.append(f"You: {user_input}")
                 response_to_input = requests.post(
                     # TODO: change when deploy
-                    url='https://writing-test-1c8k.onrender.com/chat',
+                    url=f'{BASE_URL}/chat',
                     json={
                         'user_id': user_id,
                         'thread_id': thread_id,

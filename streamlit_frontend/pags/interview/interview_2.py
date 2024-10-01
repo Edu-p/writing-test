@@ -1,4 +1,7 @@
 import streamlit as st
+import requests
+import time
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -87,7 +90,7 @@ def interview_test():
     else:
         time.sleep(2)
 
-        st.session_state['page'] = 'interview_3'
+        st.session_state['page'] = 'report_activity_3'
 
         st.rerun()
 

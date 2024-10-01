@@ -8,6 +8,7 @@ from pags.report_activity.report_activity_3 import show_conversation_summary
 from pags.view_metrics import view_overall_metrics
 from pags.past_tests import show_import_tests
 from pags.interview.interview_1 import explanation_of_test_interview
+from pags.interview.interview_2 import interview_test
 
 
 st.set_page_config(page_title="Writing Test Platform",
