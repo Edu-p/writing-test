@@ -35,6 +35,8 @@ elif st.session_state['page'] == 'report_activity_3':
 # flux interview
 elif st.session_state['page'] == 'interview_1':
     explanation_of_test_interview()
+elif st.session_state['page'] == 'interview_2':
+    interview_test()
 
 # flux see metrics
 elif st.session_state['page'] == 'view_overall':
