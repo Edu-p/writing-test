@@ -25,6 +25,18 @@ def get_conversation():
             "role": "system",
             "content": prompt
         })
+    elif type_of_test == 'interview':
+        prompt = """
+            You are a tech lead. The purpose of this conversation is to interview a software engineer. Think about the better type of question that you can ask to gather comprehensive information about their activities, progress, challenges, and any support they might need. \
+            Please, be short as possible on your responses. You will be supported by best questions(based on top100 most frequent in interview) and the best context based on user's CV. 
+        """
+
+        db.Conversations.insert_one({
+            "thread_id": thread_id,
+            "user_id": user_id,
+            "role": "system",
+            "content": prompt
+        })
     else:
         return jsonify({"error": "Type of test not found"})
 
