@@ -58,7 +58,7 @@ def interview_test():
     user_input = st.text_input(
         "Your message:", value=st.session_state['user_input'])
 
-    if st.session_state['step_of_conversation'] < 9:
+    if st.session_state['step_of_conversation'] < 3:
         if st.button("Send", disabled=st.session_state['send_button_clicked']):
             if user_input:
                 st.session_state['send_button_clicked'] = True

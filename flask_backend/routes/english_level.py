@@ -26,12 +26,11 @@ def get_english_level():
 
         prompt_english_level = """
             Identify the items based on previous conversation:
-                - Level of english(0% min and 100% max)
                 - CEPR(A1, A2,..., C2)
             
             To evaluate the level of user you can think in these criteria "Grammar and Syntax", "Vocabulary and Word Choice", "Coherence and Cohesion", "Clarity of Expression", "Task Achievement". \
-            Format your response as a JSON object with \
-            "level" and "CEPR". \
+            Format your response as a JSON object with just "CEPR". \
+            for example: {"CEPR":"A1"} or {"CEPR":"C2"} or... \
             I don't want you to send any other token outside of this json, just the json. \
             Make your response as short as possible.
         """
@@ -40,8 +39,10 @@ def get_english_level():
 
         response = get_completion_from_messages(messages)
 
+        print(f"REPONSE ->{response}")
+
         match = re.search(
-            r'\{\s*"level"\s*:\s*\d+\s*,\s*"CEPR"\s*:\s*"[A-Z0-9]+"\s*\}', response, re.DOTALL)
+            r'\{\s*"CEPR"\s*:\s*"[A-Z0-9]+"\s*\}', response, re.DOTALL)
 
         if match:
             response_json = match.group(0)
@@ -53,7 +54,6 @@ def get_english_level():
         db.EnglishLevel.insert_one({
             "thread_id": thread_id,
             "user_id": user_id,
-            "level": response_dict['level'],
             "CEPR": response_dict['CEPR']
         })
 
