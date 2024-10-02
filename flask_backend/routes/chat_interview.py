@@ -7,6 +7,8 @@ from llama_index.core.readers.file.base import SimpleDirectoryReader
 from llama_index.core import Document
 from llama_index.core.node_parser.text.sentence_window import SentenceWindowNodeParser
 from llama_index.core.postprocessor import MetadataReplacementPostProcessor
+import json
+import re
 
 from llama_index.core import Settings
 
@@ -31,8 +33,6 @@ node_parser = SentenceWindowNodeParser.from_defaults(
 )
 
 # helper functions
-
-
 def reconstruct_index(index_data):
     documents = [Document(text=doc['text']) for doc in index_data['documents']]
     nodes = node_parser.get_nodes_from_documents(documents)
@@ -82,7 +82,13 @@ def generate_final_message(best_question: str, best_context: str, content: str, 
         And the best context from the user's CV:
         {best_context}
 
-        Generate a brief discussion about what was talked about, and then present the next question(best question) and you need to incorporate the context from the CV in the question.
+        Generate a brief discussion about what was talked about, and then present the next question(best question) and you need to incorporate the context from the CV in the question. This will be your "response".
+
+        In addition i want to receive the next logic message of conversation and one text correcting ALL my errors. Like verb tenses,... \
+        Example of correction: "You wrote "I need to do a conversation with you." A more natural way to say this is "I need to have a conversation with you."" \
+        Format your response as a JSON object with "response" and "corr" \
+        I don't want you to send any other token outside of this json, just the json. \
+        Make your response as short as possible.
     """
     messages.append({"role": "user", "content": prompt})
 
@@ -150,9 +156,24 @@ def interview_chat_gen():
         ).query(content)
         best_context = str(best_context_response)
 
-        final_message_from_llm = generate_final_message(
+        response = generate_final_message(
             best_question, best_context, content, messages
         )
+
+        match = re.search(r'\{\s*"response"\s*:\s*".*"\s*,\s*"corr"\s*:\s*".*"\s*\}', response, re.DOTALL)
+
+        print()
+
+        if match:
+            
+            response_json = match.group(0)
+            print(f"Extracted JSON: {response_json}")
+        else:
+            print("No match found")
+
+        response_dict = json.loads(response_json)
+
+        
 
         db.Conversations.insert_many([
             {
@@ -165,11 +186,11 @@ def interview_chat_gen():
                 "thread_id": thread_id,
                 "user_id": user_id,
                 "role": "assistant",
-                "content": final_message_from_llm
+                "content": response_dict['response']
             }
         ])
 
-        return jsonify({'response': final_message_from_llm})
+        return jsonify({"response": response_dict['response'], "corr": response_dict['corr']})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
