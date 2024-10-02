@@ -25,7 +25,7 @@ def show_conversation_summary():
     if response.status_code == 200:
         data = response.json()
         st.text_area(
-            "", f"You have achieved: {data['CEPR']} <COT IN FUTURE>")
+            "", f"You have achieved: {data['CEPR']} \nExplanation: {data['COT']}")
         if st.button("Back to main menu"):
             st.session_state['thread_id'] = None
             st.session_state['step_of_conversation'] = 0

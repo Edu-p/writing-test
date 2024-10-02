@@ -69,7 +69,7 @@ def create_cv_index(user_id):
     return index
 
 
-def generate_final_message(best_question, best_context, content, messages):
+def generate_final_message(best_question: str, best_context: str, content: str, messages: list) -> str:
     prompt = f"""
         You are a virtual interviewer simulating a technical interview.
 

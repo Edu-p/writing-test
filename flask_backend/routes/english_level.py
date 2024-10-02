@@ -17,7 +17,7 @@ def get_english_level():
     already_computed = db.EnglishLevel.find_one(
         {"thread_id": thread_id, "user_id": user_id})
     if already_computed:
-        return jsonify({"level": already_computed['level'], "CEPR": already_computed['CEPR']})
+        return jsonify({"COT": already_computed['COT'], "CEPR": already_computed['CEPR']})
     else:
         conversations = db.Conversations.find(
             {"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
@@ -26,11 +26,11 @@ def get_english_level():
 
         prompt_english_level = """
             Identify the items based on previous conversation:
-                - CEPR(A1, A2,..., C2)
+            - CEPR(A1, A2,..., C2)
             
             To evaluate the level of user you can think in these criteria "Grammar and Syntax", "Vocabulary and Word Choice", "Coherence and Cohesion", "Clarity of Expression", "Task Achievement". \
-            Format your response as a JSON object with just "CEPR". \
-            for example: {"CEPR":"A1"} or {"CEPR":"C2"} or... \
+            Format your response as a JSON object with "CEPR" and "COT". \
+            for example: {"CEPR":"A1", "COT": "In second message you typed wrong jst and the correct is just"} or {"CEPR":"C2", "COT": "based on "Grammar and Syntax", "Vocabulary and Word Choice", "Coherence and Cohesion", "Clarity of Expression", "Task Achievement" you have done all perfectly"} or... \
             I don't want you to send any other token outside of this json, just the json. \
             Make your response as short as possible.
         """
@@ -39,10 +39,8 @@ def get_english_level():
 
         response = get_completion_from_messages(messages)
 
-        print(f"REPONSE ->{response}")
-
         match = re.search(
-            r'\{\s*"CEPR"\s*:\s*"[A-Z0-9]+"\s*\}', response, re.DOTALL)
+            r'\{\s*"CEPR"\s*:\s*"[A-Z0-9]+"\s*,\s*"COT"\s*:\s*".*?"\s*\}', response, re.DOTALL)
 
         if match:
             response_json = match.group(0)
@@ -54,7 +52,8 @@ def get_english_level():
         db.EnglishLevel.insert_one({
             "thread_id": thread_id,
             "user_id": user_id,
-            "CEPR": response_dict['CEPR']
+            "CEPR": response_dict['CEPR'],
+            "COT": response_dict['COT']
         })
 
         return jsonify(response_dict)
