@@ -29,16 +29,17 @@ def show_import_tests():
             "user_id": user_id
         }
     )
+
     if response.status_code == 200:
         data = response.json()
-        attempts = data
-        attempts = list(attempts)
+        attempts = list(zip(data['cot'], data['grades']))
         total_attempts = len(attempts)
 
         for index, attempt in enumerate(reversed(attempts), start=1):
             original_index = total_attempts - index + 1
             st.text(f"Attempt number: {original_index}")
-            st.text(f"CEPR: {attempt}")
+            st.text(f"CEPR: {attempt[1]}")
+            st.text(f"Explanation: {attempt[0]}")
             st.text("-----")
 
     else:

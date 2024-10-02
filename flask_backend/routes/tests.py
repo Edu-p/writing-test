@@ -13,7 +13,9 @@ def return_all_tests():
         {"user_id": user_id}).sort("_id", pymongo.ASCENDING)
 
     grades_list = []
+    cot_list = []
     for grade in grades:
         grades_list.append(grade['CEPR'])
+        cot_list.append(grade['COT'])
 
-    return jsonify(grades_list), 200
+    return jsonify({"grades": grades_list, "cot": cot_list}), 200
