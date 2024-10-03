@@ -18,8 +18,12 @@ from llama_index.embeddings.openai import OpenAIEmbedding
 
 import pymongo
 
+from deepeval.integrations.llama_index import DeepEvalAnswerRelevancyEvaluator
+from deepeval.integrations.llama_index import DeepEvalFaithfulnessEvaluator
+from deepeval.integrations.llama_index import DeepEvalContextualRelevancyEvaluator
+
 # basic llm setup
-llm = OpenAI(model='gpt-4')
+llm = OpenAI(model='gpt-4o')
 embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 
 Settings.llm = llm
@@ -107,6 +111,11 @@ def interview_chat_gen():
     thread_id = data['thread_id']
     content = data['content']
 
+    ar_evaluator = DeepEvalAnswerRelevancyEvaluator()
+    f_evaluator = DeepEvalFaithfulnessEvaluator()
+    cr_evaluator = DeepEvalContextualRelevancyEvaluator()
+
+
     if not all([data, user_id, content]):
         return jsonify({"error": "Missing required fields"}), 400
 
@@ -147,6 +156,19 @@ def interview_chat_gen():
             node_postprocessor=[MetadataReplacementPostProcessor(
                 target_metadata_key='window')]
         ).query(content)
+
+        cr_evaluation_result = cr_evaluator.evaluate_response(query=content, response=best_question_response)
+        ar_evaluation_result = ar_evaluator.evaluate_response(query=content, response=best_question_response)
+        f_evaluation_result = f_evaluator.evaluate_response(query=content, response=best_question_response)
+
+        db.Evals.insert_one({
+            "entity": "interview_index",
+            "thread_id": thread_id,
+            "cr": cr_evaluation_result.score,
+            "ar": ar_evaluation_result.score, 
+            "f": f_evaluation_result.score,
+        })
+
         best_question = str(best_question_response)
 
         best_context_response = cv_index.as_query_engine(
