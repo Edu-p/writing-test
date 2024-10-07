@@ -22,8 +22,15 @@ from deepeval.integrations.llama_index import DeepEvalAnswerRelevancyEvaluator
 from deepeval.integrations.llama_index import DeepEvalFaithfulnessEvaluator
 from deepeval.integrations.llama_index import DeepEvalContextualRelevancyEvaluator
 
+from deepeval.metrics import AnswerRelevancyMetric
+
+import nest_asyncio
+
+# avoiding conflicts with event loop(due to deepeval methods)
+nest_asyncio.apply()
+
 # basic llm setup
-llm = OpenAI(model='gpt-4o')
+llm = OpenAI(model='gpt-4o-mini')
 embed_model = OpenAIEmbedding(model="text-embedding-3-small")
 
 Settings.llm = llm
@@ -37,6 +44,8 @@ node_parser = SentenceWindowNodeParser.from_defaults(
 )
 
 # helper functions
+
+
 def reconstruct_index(index_data):
     documents = [Document(text=doc['text']) for doc in index_data['documents']]
     nodes = node_parser.get_nodes_from_documents(documents)
@@ -115,7 +124,6 @@ def interview_chat_gen():
     f_evaluator = DeepEvalFaithfulnessEvaluator()
     cr_evaluator = DeepEvalContextualRelevancyEvaluator()
 
-
     if not all([data, user_id, content]):
         return jsonify({"error": "Missing required fields"}), 400
 
@@ -157,15 +165,18 @@ def interview_chat_gen():
                 target_metadata_key='window')]
         ).query(content)
 
-        cr_evaluation_result = cr_evaluator.evaluate_response(query=content, response=best_question_response)
-        ar_evaluation_result = ar_evaluator.evaluate_response(query=content, response=best_question_response)
-        f_evaluation_result = f_evaluator.evaluate_response(query=content, response=best_question_response)
+        cr_evaluation_result = cr_evaluator.evaluate_response(
+            query=content, response=best_question_response)
+        ar_evaluation_result = ar_evaluator.evaluate_response(
+            query=content, response=best_question_response)
+        f_evaluation_result = f_evaluator.evaluate_response(
+            query=content, response=best_question_response)
 
         db.Evals.insert_one({
             "entity": "interview_index",
             "thread_id": thread_id,
             "cr": cr_evaluation_result.score,
-            "ar": ar_evaluation_result.score, 
+            "ar": ar_evaluation_result.score,
             "f": f_evaluation_result.score,
         })
 
@@ -178,24 +189,37 @@ def interview_chat_gen():
         ).query(content)
         best_context = str(best_context_response)
 
+        cr_evaluation_result = cr_evaluator.evaluate_response(
+            query=content, response=best_question_response)
+        ar_evaluation_result = ar_evaluator.evaluate_response(
+            query=content, response=best_question_response)
+        f_evaluation_result = f_evaluator.evaluate_response(
+            query=content, response=best_question_response)
+
+        db.Evals.insert_one({
+            "entity": "cv_index",
+            "thread_id": thread_id,
+            "cr": cr_evaluation_result.score,
+            "ar": ar_evaluation_result.score,
+            "f": f_evaluation_result.score,
+        })
+
         response = generate_final_message(
             best_question, best_context, content, messages
         )
 
-        match = re.search(r'\{\s*"response"\s*:\s*".*"\s*,\s*"corr"\s*:\s*".*"\s*\}', response, re.DOTALL)
+        match = re.search(
+            r'\{\s*"response"\s*:\s*".*"\s*,\s*"corr"\s*:\s*".*"\s*\}', response, re.DOTALL)
 
         print()
 
         if match:
-            
             response_json = match.group(0)
             print(f"Extracted JSON: {response_json}")
         else:
             print("No match found")
 
         response_dict = json.loads(response_json)
-
-        
 
         db.Conversations.insert_many([
             {
