@@ -24,6 +24,11 @@ from deepeval.integrations.llama_index import DeepEvalContextualRelevancyEvaluat
 
 from deepeval.metrics import AnswerRelevancyMetric
 
+from deepeval.test_case import LLMTestCase
+from deepeval.metrics import AnswerRelevancyMetric
+
+from deepeval import evaluate
+
 import nest_asyncio
 
 # avoiding conflicts with event loop(due to deepeval methods)
@@ -106,6 +111,21 @@ def generate_final_message(best_question: str, best_context: str, content: str, 
     messages.append({"role": "user", "content": prompt})
 
     response = get_completion_from_messages(messages)
+
+    metric = AnswerRelevancyMetric(
+        threshold=0.7,
+        model="gpt-4o-mini",
+        include_reason=False
+    )
+
+    test_case = LLMTestCase(
+        input=prompt,
+        actual_output=response
+    )
+
+    evaluation = evaluate([test_case], [metric])
+
+    print(f"Eval: {evaluation[0].metrics_data[0].score}")
 
     return response
 
@@ -210,8 +230,6 @@ def interview_chat_gen():
 
         match = re.search(
             r'\{\s*"response"\s*:\s*".*"\s*,\s*"corr"\s*:\s*".*"\s*\}', response, re.DOTALL)
-
-        print()
 
         if match:
             response_json = match.group(0)

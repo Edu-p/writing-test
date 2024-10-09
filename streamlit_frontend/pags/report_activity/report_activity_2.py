@@ -57,14 +57,17 @@ def report_test():
                      height=300, disabled=True)
         st.session_state['step_of_conversation'] += 1
 
-        st.text_area("Correction of last message", 'No correction received yet.', height=100, disabled=True)
+        st.text_area("Correction of last message",
+                     'No correction received yet.', height=100, disabled=True)
     else:
         conversation_display = "\n".join(st.session_state.conversation)
         st.text_area("Conversation", conversation_display,
                      height=300, disabled=True)
-        
-        last_correction = st.session_state.get('last_correction', 'No correction received yet.')
-        st.text_area("Correction of last message", last_correction, height=100, disabled=True)
+
+        last_correction = st.session_state.get(
+            'last_correction', 'No correction received yet.')
+        st.text_area("Correction of last message",
+                     last_correction, height=100, disabled=True)
 
     user_input = st.text_input(
         "Your message:", value=st.session_state['user_input'])
@@ -103,7 +106,7 @@ def report_test():
 
                     st.rerun()
                 else:
-                    st.error('Error in response from backend')   
+                    st.error('Error in response from backend')
     else:
         time.sleep(2)
 
