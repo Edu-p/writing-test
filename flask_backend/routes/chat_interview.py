@@ -87,7 +87,7 @@ def create_cv_index(user_id):
     return index
 
 
-def generate_final_message(best_question: str, best_context: str, content: str, messages: list) -> str:
+def generate_final_message(best_question: str, best_context: str, content: str, messages: list, thread_id) -> str:
     prompt = f"""
         You are a virtual interviewer simulating a technical interview.
 
@@ -112,10 +112,13 @@ def generate_final_message(best_question: str, best_context: str, content: str, 
 
     response = get_completion_from_messages(messages)
 
+    print(f"Generated response: {response}")
+
     metric = AnswerRelevancyMetric(
         threshold=0.7,
         model="gpt-4o-mini",
-        include_reason=False
+        include_reason=False,
+        async_mode=False
     )
 
     test_case = LLMTestCase(
@@ -125,7 +128,15 @@ def generate_final_message(best_question: str, best_context: str, content: str, 
 
     evaluation = evaluate([test_case], [metric])
 
-    print(f"Eval: {evaluation[0].metrics_data[0].score}")
+    print(f"AR: {evaluation[0].metrics_data[0].score}")
+
+    db.Evals.insert_one({
+            "entity": "final_entity",
+            "thread_id": thread_id,
+            "cr": 0,
+            "ar": evaluation[0].metrics_data[0].score,
+            "f": 0,
+    })
 
     return response
 
@@ -140,9 +151,9 @@ def interview_chat_gen():
     thread_id = data['thread_id']
     content = data['content']
 
-    ar_evaluator = DeepEvalAnswerRelevancyEvaluator()
-    f_evaluator = DeepEvalFaithfulnessEvaluator()
-    cr_evaluator = DeepEvalContextualRelevancyEvaluator()
+    # ar_evaluator = DeepEvalAnswerRelevancyEvaluator()
+    # f_evaluator = DeepEvalFaithfulnessEvaluator()
+    # cr_evaluator = DeepEvalContextualRelevancyEvaluator()
 
     if not all([data, user_id, content]):
         return jsonify({"error": "Missing required fields"}), 400
@@ -185,20 +196,20 @@ def interview_chat_gen():
                 target_metadata_key='window')]
         ).query(content)
 
-        cr_evaluation_result = cr_evaluator.evaluate_response(
-            query=content, response=best_question_response)
-        ar_evaluation_result = ar_evaluator.evaluate_response(
-            query=content, response=best_question_response)
-        f_evaluation_result = f_evaluator.evaluate_response(
-            query=content, response=best_question_response)
+        # cr_evaluation_result = cr_evaluator.evaluate_response(
+        #     query=content, response=best_question_response)
+        # ar_evaluation_result = ar_evaluator.evaluate_response(
+        #     query=content, response=best_question_response)
+        # f_evaluation_result = f_evaluator.evaluate_response(
+        #     query=content, response=best_question_response)
 
-        db.Evals.insert_one({
-            "entity": "interview_index",
-            "thread_id": thread_id,
-            "cr": cr_evaluation_result.score,
-            "ar": ar_evaluation_result.score,
-            "f": f_evaluation_result.score,
-        })
+        # db.Evals.insert_one({
+        #     "entity": "interview_index",
+        #     "thread_id": thread_id,
+        #     "cr": cr_evaluation_result.score,
+        #     "ar": ar_evaluation_result.score,
+        #     "f": f_evaluation_result.score,
+        # })
 
         best_question = str(best_question_response)
 
@@ -209,23 +220,23 @@ def interview_chat_gen():
         ).query(content)
         best_context = str(best_context_response)
 
-        cr_evaluation_result = cr_evaluator.evaluate_response(
-            query=content, response=best_question_response)
-        ar_evaluation_result = ar_evaluator.evaluate_response(
-            query=content, response=best_question_response)
-        f_evaluation_result = f_evaluator.evaluate_response(
-            query=content, response=best_question_response)
+        # cr_evaluation_result = cr_evaluator.evaluate_response(
+        #     query=content, response=best_question_response)
+        # ar_evaluation_result = ar_evaluator.evaluate_response(
+        #     query=content, response=best_question_response)
+        # f_evaluation_result = f_evaluator.evaluate_response(
+        #     query=content, response=best_question_response)
 
-        db.Evals.insert_one({
-            "entity": "cv_index",
-            "thread_id": thread_id,
-            "cr": cr_evaluation_result.score,
-            "ar": ar_evaluation_result.score,
-            "f": f_evaluation_result.score,
-        })
+        # db.Evals.insert_one({
+        #     "entity": "cv_index",
+        #     "thread_id": thread_id,
+        #     "cr": cr_evaluation_result.score,
+        #     "ar": ar_evaluation_result.score,
+        #     "f": f_evaluation_result.score,
+        # })
 
         response = generate_final_message(
-            best_question, best_context, content, messages
+            best_question, best_context, content, messages, thread_id
         )
 
         match = re.search(
@@ -234,8 +245,12 @@ def interview_chat_gen():
         if match:
             response_json = match.group(0)
             print(f"Extracted JSON: {response_json}")
+            response_dict = json.loads(response_json)
         else:
             print("No match found")
+            # Handle the error appropriately
+            return jsonify({"error": "Failed to parse response from AI assistant."}), 500
+
 
         response_dict = json.loads(response_json)
 
