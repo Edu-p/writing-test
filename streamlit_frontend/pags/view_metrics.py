@@ -21,6 +21,14 @@ def view_overall_metrics():
             'user_id': user_id,
         }
     )
+    
+    response_get_mean_ar = requests.post(
+        url=f'{BASE_URL}/evals',
+        json={
+            'user_id': user_id
+        }
+    )
+
     if response_get_max_metric.status_code == 200:
         data = response_get_max_metric.json()
 
@@ -31,6 +39,19 @@ def view_overall_metrics():
     else:
         st.markdown(
             f"<h2 style='font-size:30px;'>To compute max level you need to do a test</h2>", unsafe_allow_html=True)
+    
+    if response_get_mean_ar.status_code == 200:
+        data = response_get_mean_ar.json()
+
+        mean_ar = data['mean_ar']
+
+        st.markdown(
+            f"<h2 style='font-size:30px;'>Mean answer relevancy, based on previous conversations: {int(100*mean_ar)}%</h2>", unsafe_allow_html=True)
+    else:
+        st.markdown(
+            f"<h2 style='font-size:30px;'>To compute answer relevancy you need to do a test</h2>", unsafe_allow_html=True)
+
+
 
     st.write("")
     if st.button("Back"):
