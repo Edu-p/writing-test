@@ -87,7 +87,7 @@ def create_cv_index(user_id):
     return index
 
 
-def generate_final_message(best_question: str, best_context: str, content: str, messages: list, thread_id) -> str:
+def generate_final_message(best_question: str, best_context: str, content: str, messages: list, thread_id: str, user_id: str) -> str:
     prompt = f"""
         You are a virtual interviewer simulating a technical interview.
 
@@ -133,6 +133,7 @@ def generate_final_message(best_question: str, best_context: str, content: str, 
     db.Evals.insert_one({
             "entity": "final_entity",
             "thread_id": thread_id,
+            "user_id": user_id,
             "cr": 0,
             "ar": evaluation[0].metrics_data[0].score,
             "f": 0,
@@ -205,7 +206,8 @@ def interview_chat_gen():
 
         # db.Evals.insert_one({
         #     "entity": "interview_index",
-        #     "thread_id": thread_id,
+#             "thread_id": thread_id,
+        #     "user_id": user_id,
         #     "cr": cr_evaluation_result.score,
         #     "ar": ar_evaluation_result.score,
         #     "f": f_evaluation_result.score,
@@ -230,13 +232,14 @@ def interview_chat_gen():
         # db.Evals.insert_one({
         #     "entity": "cv_index",
         #     "thread_id": thread_id,
+        #     "user_id": user_id,
         #     "cr": cr_evaluation_result.score,
         #     "ar": ar_evaluation_result.score,
         #     "f": f_evaluation_result.score,
         # })
 
         response = generate_final_message(
-            best_question, best_context, content, messages, thread_id
+            best_question, best_context, content, messages, thread_id, user_id
         )
 
         match = re.search(
