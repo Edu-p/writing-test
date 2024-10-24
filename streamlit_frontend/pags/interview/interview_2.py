@@ -1,6 +1,5 @@
 import streamlit as st
 import requests
-import time
 import os
 from dotenv import load_dotenv
 
@@ -8,104 +7,224 @@ load_dotenv()
 
 BASE_URL = os.getenv('BASE_URL')
 
-def interview_test():
-    st.title("Chatbot Conversation - Interview Test")
 
-    # verifications in session state
+def interview_test():
+    st.markdown(
+        """
+        <style>
+        /* Style the back button */
+        div.back-button > button {
+            background-color: #f0f0f0;
+            color: #333333;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            width: auto;
+        }
+        div.back-button > button:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Center and style the title */
+        .chat-title {
+            text-align: center;
+            color: #333333;
+            font-size: 28px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        /* Chat container */
+        .chat-container {
+            max-width: 600px;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+
+        /* Chat bubbles */
+        .chat-bubble {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            width: fit-content;
+            max-width: 80%;
+        }
+
+        .chat-bubble.bot {
+            background-color: #f0f0f0;
+            align-self: flex-start;
+        }
+
+        .chat-bubble.user {
+            background-color: #4CAF50;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        /* Correction box */
+        .correction-box {
+            background-color: #fff5f5;
+            border: 1px solid #ffcccc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        /* Message input */
+        .message-input textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            resize: none;
+        }
+
+        /* Send button */
+        .send-button > button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .send-button > button:hover {
+            background-color: #45a049;
+        }
+
+        /* Center elements */
+        .centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown('<div class="back-button">', unsafe_allow_html=True)
+    if st.button("← Back", key="back"):
+        st.session_state['page'] = 'choose_wtc'
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="chat-title">Interview Test</div>',
+                unsafe_allow_html=True)
+
     if 'user_id' not in st.session_state:
         st.session_state['user_id'] = ''
     if 'conversation' not in st.session_state:
-        st.session_state.conversation = []
+        st.session_state['conversation'] = []
     if 'thread_id' not in st.session_state:
         st.session_state['thread_id'] = None
     if 'step_of_conversation' not in st.session_state:
         st.session_state['step_of_conversation'] = 0
-    if 'send_button_clicked' not in st.session_state:
-        st.session_state['send_button_clicked'] = False
     if 'user_input' not in st.session_state:
         st.session_state['user_input'] = ""
-    if "last_correction" not in st.session_state:
-        st.session_state['last_correction'] = "No correction yet."
+    if 'last_correction' not in st.session_state:
+        st.session_state['last_correction'] = ""
 
-    # get thread_id to start conversation
     user_id = st.session_state['user_id']
     thread_id = st.session_state['thread_id']
 
-    if thread_id:
-        print('Thread ID exists:', thread_id)
-    else:
-        response_to_thread_id = requests.post(
-            # TODO: change when deploy
+    if thread_id is None:
+        response = requests.post(
             url=f'{BASE_URL}/get_conversation',
             json={
                 'user_id': user_id,
                 'type_of_test': 'interview'
             }
         )
-        data = response_to_thread_id.json()
-        st.session_state['thread_id'] = data['thread_id']
-        thread_id = st.session_state['thread_id'] 
+        if response.status_code == 200:
+            data = response.json()
+            st.session_state['thread_id'] = data['thread_id']
+        else:
+            st.error("Failed to start the conversation. Please try again.")
+            return
 
+    st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     if st.session_state['step_of_conversation'] == 0:
-        st.session_state.conversation.append(
-            "Bot: Hi! What is the project you are most proud of, and how did you contribute to it?\n")
-        conversation_display = "\n".join(st.session_state.conversation)
-        st.text_area("Conversation", conversation_display,
-                     height=300, disabled=True)
+        initial_bot_message = "Hi! What is the project you are most proud of, and how did you contribute to it?"
+        st.session_state['conversation'].append(
+            {'sender': 'bot', 'message': initial_bot_message})
         st.session_state['step_of_conversation'] += 1
 
-        st.text_area("Correction of last message", 'No correction received yet.', height=100, disabled=True)
-    else:
-        conversation_display = "\n".join(st.session_state.conversation)
-        st.text_area("Conversation", conversation_display,
-                     height=300, disabled=True)
-        last_correction = st.session_state.get('last_correction', 'No correction received yet.')
-        st.text_area("Correction of last message", last_correction, height=100, disabled=True)
+    for msg in st.session_state['conversation']:
+        sender = msg['sender']
+        message = msg['message'].replace('\n', '<br>')
+        if sender == 'bot':
+            st.markdown(f'''
+                <div class="chat-bubble bot">
+                    {message}
+                </div>
+            ''', unsafe_allow_html=True)
+        else:
+            st.markdown(f'''
+                <div class="chat-bubble user">
+                    {message}
+                </div>
+            ''', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    user_input = st.text_input(
-        "Your message:", value=st.session_state['user_input'])
+    if st.session_state['last_correction']:
+        correction = st.session_state['last_correction'].replace('\n', '<br>')
+        st.markdown(f'''
+            <div class="correction-box">
+                <strong>Correction of your last message:</strong><br>
+                {correction}
+            </div>
+        ''', unsafe_allow_html=True)
 
     if st.session_state['step_of_conversation'] < 3:
-        if st.button("Send", disabled=st.session_state['send_button_clicked']):
-            if user_input:
-                st.session_state['send_button_clicked'] = True
+        st.markdown('<div class="message-input">', unsafe_allow_html=True)
+        user_input = st.text_area(
+            "Your message:", value=st.session_state['user_input'], height=100)
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="send-button">', unsafe_allow_html=True)
+        if st.button("Send", key="send"):
+            if user_input.strip():
+                st.session_state['conversation'].append(
+                    {'sender': 'user', 'message': user_input})
+                st.session_state['user_input'] = ""
                 st.session_state['step_of_conversation'] += 1
-                st.session_state.conversation.append(f"You: {user_input}")
-                response_to_input = requests.post(
-                    # TODO: change when deploy
+
+                response = requests.post(
                     url=f'{BASE_URL}/interview_chat',
                     json={
                         'user_id': user_id,
-                        'thread_id': thread_id,
+                        'thread_id': st.session_state['thread_id'],
                         'content': user_input
                     }
                 )
 
-                if response_to_input.status_code == 200:
-                    data = response_to_input.json()
+                if response.status_code == 200:
+                    data = response.json()
                     llm_response = data['response']
                     llm_correction = data['corr']
-                    
-                    response = (f"Bot: {llm_response}\n")
-                    print(f"Bot: {llm_response}', thread_id -> {thread_id}")
 
-                    st.session_state['user_input'] = ""
-
-                    st.session_state.conversation.append(response)
-
+                    st.session_state['conversation'].append(
+                        {'sender': 'bot', 'message': llm_response})
                     st.session_state['last_correction'] = llm_correction
-
-                    st.session_state['send_button_clicked'] = False
 
                     st.rerun()
                 else:
-                    st.error('Error in response from backend')
+                    st.error('Error in response from backend. Please try again.')
+            else:
+                st.warning('Please enter a message before sending.')
+        st.markdown('</div>', unsafe_allow_html=True)
     else:
-        time.sleep(2)
-
+        st.success("Conversation completed. Redirecting...")
         st.session_state['page'] = 'report_activity_3'
-
         st.rerun()
-
-
-
