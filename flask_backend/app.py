@@ -6,6 +6,7 @@ from routes.conversation import conversation_bp
 from routes.chat import chat_bp
 from routes.explanations import explanations_bp
 from routes.auth import auth_bp
+from routes.past_eval import eval_bp
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_swagger_ui import get_swaggerui_blueprint
@@ -38,6 +39,7 @@ app.register_blueprint(english_level_bp)
 app.register_blueprint(tests_bp)
 app.register_blueprint(store_cv_bp)
 app.register_blueprint(interview_bp)
+app.register_blueprint(eval_bp)
 
 # serve swagger ui
 SWAGGER_URL = '/swagger'
