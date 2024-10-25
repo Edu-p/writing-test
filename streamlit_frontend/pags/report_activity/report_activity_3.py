@@ -75,7 +75,7 @@ def show_conversation_summary():
 
     if response.status_code == 200:
         data = response.json()
-        cefr_level = data.get('CEPR', 'N/A')
+        cefr_level = data.get('CEFR', 'N/A')
         explanation = data.get('COT', 'No explanation available.')
 
         explanation = explanation.replace('\n', '<br>')

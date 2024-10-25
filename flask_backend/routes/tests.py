@@ -15,7 +15,7 @@ def return_all_tests():
     grades_list = []
     cot_list = []
     for grade in grades:
-        grades_list.append(grade['CEPR'])
+        grades_list.append(grade['CEFR'])
         cot_list.append(grade['COT'])
 
     return jsonify({"grades": grades_list, "cot": cot_list}), 200

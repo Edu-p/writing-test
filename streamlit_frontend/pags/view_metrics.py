@@ -138,8 +138,8 @@ def view_overall_metrics():
         max_level_html += '<h3>🏆 Your Max Level Achieved</h3>'
         if response_get_max_metric.status_code == 200:
             data = response_get_max_metric.json()
-            max_cepr = data['max_cepr']
-            max_level_html += f"<div class='value'>{max_cepr}</div>"
+            max_CEFR = data['max_CEFR']
+            max_level_html += f"<div class='value'>{max_CEFR}</div>"
         else:
             max_level_html += "<div class='value'>N/A</div>"
             max_level_html += "<div class='description'>Complete a test to see your max level.</div>"
