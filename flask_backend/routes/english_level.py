@@ -59,7 +59,7 @@ def get_english_level():
     already_computed = db.EnglishLevel.find_one(
         {"thread_id": thread_id, "user_id": user_id})
     if already_computed:
-        return jsonify({"COT": already_computed['COT'], "CEFR": already_computed['CEFR']})
+        return jsonify({"COT": already_computed['COT'], "CEFR": already_computed['CEFR'], "CEFR_GS": already_computed['CEFR_GS'], "CEFR_VW": already_computed['CEFR_VW'], "CEFR_CC": already_computed['CEFR_CC'], "CEFR_CE": already_computed['CEFR_CE']})
     else:
         conversations = db.Conversations.find(
             {"thread_id": thread_id}).sort("_id", pymongo.ASCENDING)
