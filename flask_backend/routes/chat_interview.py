@@ -112,7 +112,7 @@ def generate_final_message(best_question: str, best_context: str, content: str, 
 
     response = get_completion_from_messages(messages)
 
-    print(f"Generated response: {response}")
+    # print(f"Generated response: {response}")
 
     metric = AnswerRelevancyMetric(
         threshold=0.7,
@@ -128,7 +128,7 @@ def generate_final_message(best_question: str, best_context: str, content: str, 
 
     evaluation = evaluate([test_case], [metric])
 
-    print(f"AR: {evaluation[0].metrics_data[0].score}")
+    # print(f"AR: {evaluation[0].metrics_data[0].score}")
 
     db.Evals.insert_one({
             "entity": "final_entity",
@@ -247,10 +247,10 @@ def interview_chat_gen():
 
         if match:
             response_json = match.group(0)
-            print(f"Extracted JSON: {response_json}")
+            # print(f"Extracted JSON: {response_json}")
             response_dict = json.loads(response_json)
         else:
-            print("No match found")
+            # print("No match found")
             # Handle the error appropriately
             return jsonify({"error": "Failed to parse response from AI assistant."}), 500
 

@@ -227,4 +227,9 @@ def report_test():
     else:
         st.success("Conversation completed. Redirecting...")
         st.session_state['page'] = 'report_activity_3'
+        st.session_state['step_of_conversation'] = 0
+        st.session_state['conversation'] = []
+        st.session_state['thread_id'] = None    
+        st.session_state['last_correction'] = ""
+
         st.rerun()

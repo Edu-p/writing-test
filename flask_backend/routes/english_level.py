@@ -71,7 +71,7 @@ def get_english_level():
         eval_CC = get_piece_eval(messages=messages, pillar="Coherence and Cohesion")
         eval_CE = get_piece_eval(messages=messages, pillar="Clarity of Expressions")
 
-        print(f"eval_GS: {eval_GS}, eval_VW: {eval_VW}, eval_CC: {eval_CC}, eval_CE: {eval_CE}")
+        # print(f"eval_GS: {eval_GS}, eval_VW: {eval_VW}, eval_CC: {eval_CC}, eval_CE: {eval_CE}")
 
         prompt_english_level = f"""
             Based on the previous conversation, identify the final CEFR level (A1, A2, ..., C2).

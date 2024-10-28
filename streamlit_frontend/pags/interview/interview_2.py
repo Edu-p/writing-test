@@ -128,12 +128,12 @@ def interview_test():
         st.session_state['conversation'] = []
     if 'thread_id' not in st.session_state:
         st.session_state['thread_id'] = None
-    if 'step_of_conversation' not in st.session_state:
-        st.session_state['step_of_conversation'] = 0
+    if 'step_of_conversation_interview' not in st.session_state:
+        st.session_state['step_of_conversation_interview'] = 0
     if 'user_input' not in st.session_state:
         st.session_state['user_input'] = ""
-    if 'last_correction' not in st.session_state:
-        st.session_state['last_correction'] = ""
+    if 'last_correction_interview' not in st.session_state:
+        st.session_state['last_correction_interview'] = ""
 
     user_id = st.session_state['user_id']
     thread_id = st.session_state['thread_id']
@@ -154,11 +154,11 @@ def interview_test():
             return
 
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-    if st.session_state['step_of_conversation'] == 0:
+    if st.session_state['step_of_conversation_interview'] == 0:
         initial_bot_message = "Hi! What is the project you are most proud of, and how did you contribute to it?"
         st.session_state['conversation'].append(
             {'sender': 'bot', 'message': initial_bot_message})
-        st.session_state['step_of_conversation'] += 1
+        st.session_state['step_of_conversation_interview'] += 1
 
     for msg in st.session_state['conversation']:
         sender = msg['sender']
@@ -177,8 +177,8 @@ def interview_test():
             ''', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    if st.session_state['last_correction']:
-        correction = st.session_state['last_correction'].replace('\n', '<br>')
+    if st.session_state['last_correction_interview']:
+        correction = st.session_state['last_correction_interview'].replace('\n', '<br>')
         st.markdown(f'''
             <div class="correction-box">
                 <strong>Correction of your last message:</strong><br>
@@ -186,7 +186,7 @@ def interview_test():
             </div>
         ''', unsafe_allow_html=True)
 
-    if st.session_state['step_of_conversation'] < 3:
+    if st.session_state['step_of_conversation_interview'] < 3:
         st.markdown('<div class="message-input">', unsafe_allow_html=True)
         user_input = st.text_area(
             "Your message:", value=st.session_state['user_input'], height=100)
@@ -198,7 +198,7 @@ def interview_test():
                 st.session_state['conversation'].append(
                     {'sender': 'user', 'message': user_input})
                 st.session_state['user_input'] = ""
-                st.session_state['step_of_conversation'] += 1
+                st.session_state['step_of_conversation_interview'] += 1
 
                 response = requests.post(
                     url=f'{BASE_URL}/interview_chat',
@@ -216,7 +216,7 @@ def interview_test():
 
                     st.session_state['conversation'].append(
                         {'sender': 'bot', 'message': llm_response})
-                    st.session_state['last_correction'] = llm_correction
+                    st.session_state['last_correction_interview'] = llm_correction
 
                     st.rerun()
                 else:
@@ -227,4 +227,9 @@ def interview_test():
     else:
         st.success("Conversation completed. Redirecting...")
         st.session_state['page'] = 'report_activity_3'
+        st.session_state['step_of_conversation_interview'] = 0
+        st.session_state['conversation'] = []
+        st.session_state['thread_id'] = None    
+        st.session_state['last_correction_interview'] = ""
+
         st.rerun()

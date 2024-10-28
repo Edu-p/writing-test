@@ -44,8 +44,6 @@ def chat_response():
 
     response = generate_final_message(content, messages)
 
-    print(f"reponse -> {response}")
-
     match = re.search(
         r'\{\s*"response"\s*:\s*".*"\s*,\s*"corr"\s*:\s*".*"\s*\}', response, re.DOTALL)
 
