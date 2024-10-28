@@ -113,10 +113,20 @@ def get_english_level():
 
         response_dict = json.loads(response)
 
+        response_dict["CEFR_GS"] = eval_GS
+        response_dict["CEFR_VW"] = eval_VW
+        response_dict["CEFR_CC"] = eval_CC
+        response_dict["CEFR_CE"] = eval_CE
+
+
         db.EnglishLevel.insert_one({
             "thread_id": thread_id,
             "user_id": user_id,
             "CEFR": response_dict['CEFR'],
+            "CEFR_GS": eval_GS,
+            "CEFR_VW": eval_VW,
+            "CEFR_CC": eval_CC,
+            "CEFR_CE": eval_CE,
             "COT": response_dict['COT']
         })
 

@@ -7,33 +7,60 @@ load_dotenv()
 
 BASE_URL = os.getenv('BASE_URL')
 
-
 def show_conversation_summary():
     st.markdown(
         """
         <style>
+        /* Include Google Fonts */
+        @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #F0F2F6;
+        }
+
         /* Center and style the title */
         .summary-title {
             text-align: center;
             color: #333333;
-            font-size: 32px;
+            font-size: 36px;
+            font-weight: bold;
             margin-top: 30px;
             margin-bottom: 20px;
         }
 
         /* Style the result card */
         .result-card {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            padding: 25px;
-            border-radius: 10px;
+            background-color: #FFFFFF;
+            border: 1px solid #DDDDDD;
+            padding: 30px;
+            border-radius: 15px;
             margin-bottom: 30px;
-            line-height: 1.6;
-            font-size: 16px;
+            line-height: 1.8;
+            font-size: 18px;
+            color: #333333;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style for the main CEFR Level */
+        .result-card h1.cefr-level {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        /* Style for the sub-levels */
+        .result-card h3.sub-level {
+            font-size: 20px;
+            margin-bottom: 10px;
             color: #333333;
         }
 
-        /* Style the action button */
+        .result-card p {
+            font-size: 16px;
+            color: #555555;
+        }
+
         div.action-button > button {
             background-color: #4CAF50;
             color: white;
@@ -43,14 +70,13 @@ def show_conversation_summary():
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin: 10px;
-            width: auto;
+            margin: 20px auto;
+            display: block;
         }
         div.action-button > button:hover {
             background-color: #45a049;
         }
 
-        /* Center elements */
         .centered {
             display: flex;
             justify-content: center;
@@ -62,8 +88,7 @@ def show_conversation_summary():
         unsafe_allow_html=True
     )
 
-    st.markdown('<div class="summary-title">Test Summary</div>',
-                unsafe_allow_html=True)
+    st.markdown('<div class="summary-title">Test Summary</div>', unsafe_allow_html=True)
 
     response = requests.post(
         url=f'{BASE_URL}/get_english_level',
@@ -77,18 +102,25 @@ def show_conversation_summary():
         data = response.json()
         cefr_level = data.get('CEFR', 'N/A')
         explanation = data.get('COT', 'No explanation available.')
+        cefr_gs = data.get('CEFR_GS', 'N/A')
+        cefr_vw = data.get('CEFR_VW', 'N/A')
+        cefr_cc = data.get('CEFR_CC', 'N/A')
+        cefr_ce = data.get('CEFR_CE', 'N/A')
 
         explanation = explanation.replace('\n', '<br>')
 
         st.markdown(f'''
             <div class="result-card">
-                <h3>Your CEFR Level: <span style="color:#4CAF50;">{cefr_level}</span></h3>
+                <h1 class="cefr-level">Your CEFR Level: <span>{cefr_level}</span></h1>
+                <h3 class="sub-level">Grammar and Syntax: <span>{cefr_gs}</span></h3>
+                <h3 class="sub-level">Vocabulary and Word Choice: <span>{cefr_vw}</span></h3>
+                <h3 class="sub-level">Coherence and Cohesion: <span>{cefr_cc}</span></h3>
+                <h3 class="sub-level">Clarity of Expressions: <span>{cefr_ce}</span></h3>
                 <p><strong>Explanation:</strong><br>{explanation}</p>
             </div>
         ''', unsafe_allow_html=True)
 
-        st.markdown('<div class="action-button centered">',
-                    unsafe_allow_html=True)
+        st.markdown('<div class="action-button centered">', unsafe_allow_html=True)
         if st.button("🏠 Back to Main Menu", key="back_to_main"):
             st.session_state['thread_id'] = None
             st.session_state['step_of_conversation'] = 0
@@ -98,5 +130,4 @@ def show_conversation_summary():
             st.rerun()
         st.markdown('</div>', unsafe_allow_html=True)
     else:
-        st.error(
-            "There was a problem retrieving your test results. Please try again later.")
+        st.error("There was a problem retrieving your test results. Please try again later.")
