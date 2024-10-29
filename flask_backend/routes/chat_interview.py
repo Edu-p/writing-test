@@ -79,7 +79,7 @@ def create_interview_questions_index():
     return index
 
 
-def create_cv_index(user_id):
+def create_cv_index(user_id: str):
     cv_data = db.CVs.find_one({'user_id': user_id})
     document = Document(text=cv_data['pdf_text'])
     nodes = node_parser.get_nodes_from_documents([document])
@@ -91,22 +91,22 @@ def generate_final_message(best_question: str, best_context: str, content: str, 
     prompt = f"""
         You are a virtual interviewer simulating a technical interview.
 
-        User's last message:
-        {content}
+        User's last message (delimited by next -> <-):
+        -> {content} <-
 
-        Based on the best question:
-        {best_question}
+        Based on the best question (delimited by next -> <-):
+        -> {best_question} <-
 
-        And the best context from the user's CV:
-        {best_context}
+        And the best context from the user's CV (delimited by next -> <-):
+        -> {best_context} <-
 
-        Generate a brief discussion about what was talked about, and then present the next question(best question) and you need to incorporate the context from the CV in the question. This will be your "response".
+        Generate a brief discussion about what was talked about, and then present the next question (best question) incorporating the context from the CV. This will be your "response". If the best question or best context doesn't make sense, just ignore them. 
 
-        In addition i want to receive the next logic message of conversation and one text correcting ALL my errors. Like verb tenses,... \
-        Example of correction: "You wrote "I need to do a conversation with you." A more natural way to say this is "I need to have a conversation with you."" \
-        Format your response as a JSON object with "response" and "corr" \
-        I don't want you to send any other token outside of this json, just the json. \
-        Make your response as short as possible.
+        Additionally, provide the next logical message of the conversation and a text correcting ALL my errors, such as verb tenses(just according at to "User's last message"). For example, "You wrote 'I need to do a conversation with you.' A more natural way to say this is 'I need to have a conversation with you.'"
+
+        Format your response as a JSON object with "response" and "corr". 
+
+        Before give the final answer think a while and do not include any other tokens outside of this JSON, in this json just these 2 KEYS("response" and "corr"). Make your response as concise as possible.
     """
     messages.append({"role": "user", "content": prompt})
 
@@ -191,11 +191,18 @@ def interview_chat_gen():
         messages = [{"role": conv["role"], "content": conv["content"]}
                     for conv in conversations]
 
+        prompt_retrieve_question = f"""
+        User's last message (delimited by next -> <-):
+        -> {content} <-
+
+        According to this message, please give me the most appropriate question to ask next. Please, be brief and to the point.
+        """
+
         best_question_response = interview_index.as_query_engine(
-            similarity_top_k=6,
+            similarity_top_k=4,
             node_postprocessor=[MetadataReplacementPostProcessor(
                 target_metadata_key='window')]
-        ).query(content)
+        ).query(prompt_retrieve_question)
 
         # cr_evaluation_result = cr_evaluator.evaluate_response(
         #     query=content, response=best_question_response)
@@ -206,7 +213,7 @@ def interview_chat_gen():
 
         # db.Evals.insert_one({
         #     "entity": "interview_index",
-#             "thread_id": thread_id,
+        #     "thread_id": thread_id,
         #     "user_id": user_id,
         #     "cr": cr_evaluation_result.score,
         #     "ar": ar_evaluation_result.score,
@@ -215,11 +222,22 @@ def interview_chat_gen():
 
         best_question = str(best_question_response)
 
+        prompt_retrieve_context_cv = f"""
+        User's last message (delimited by next -> <-):
+        -> {content} <-
+
+        Best question to ask in a interview according this last message(delimited by next -> <-):
+        -> {best_question} <-
+
+        According to this message, please give me the most appropriate context about CV, it can be other experience in other place that are related for example. Please be brief and to the point.
+        """
+
         best_context_response = cv_index.as_query_engine(
-            similarity_top_k=6,
+            similarity_top_k=4,
             node_postprocessor=[MetadataReplacementPostProcessor(
                 target_metadata_key='window')]
-        ).query(content)
+        ).query(prompt_retrieve_context_cv)
+
         best_context = str(best_context_response)
 
         # cr_evaluation_result = cr_evaluator.evaluate_response(

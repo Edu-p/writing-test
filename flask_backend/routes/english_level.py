@@ -74,7 +74,7 @@ def get_english_level():
         # print(f"eval_GS: {eval_GS}, eval_VW: {eval_VW}, eval_CC: {eval_CC}, eval_CE: {eval_CE}")
 
         prompt_english_level = f"""
-            Based on the previous conversation, identify the final CEFR level (A1, A2, ..., C2).
+            Based on the previous conversation, identify the final CEFR level (A1, A2, ..., C2) of User(just eval according to "user" disregard the "system" messages). 
 
             We have specialist evaluations for this conversation in four pillars:
             - "Grammar and Syntax": {eval_GS}

@@ -151,7 +151,6 @@ def interview_test():
             st.session_state['thread_id'] = data['thread_id']
         else:
             st.error("Failed to start the conversation. Please try again.")
-            return
 
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     if st.session_state['step_of_conversation_interview'] == 0:
@@ -186,7 +185,7 @@ def interview_test():
             </div>
         ''', unsafe_allow_html=True)
 
-    if st.session_state['step_of_conversation_interview'] < 3:
+    if st.session_state['step_of_conversation_interview'] < 6:
         st.markdown('<div class="message-input">', unsafe_allow_html=True)
         user_input = st.text_area(
             "Your message:", value=st.session_state['user_input'], height=100)
