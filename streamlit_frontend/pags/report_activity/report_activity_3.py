@@ -7,6 +7,7 @@ load_dotenv()
 
 BASE_URL = os.getenv('BASE_URL')
 
+
 def show_conversation_summary():
     st.markdown(
         """
@@ -88,7 +89,8 @@ def show_conversation_summary():
         unsafe_allow_html=True
     )
 
-    st.markdown('<div class="summary-title">Test Summary</div>', unsafe_allow_html=True)
+    st.markdown('<div class="summary-title">Test Summary</div>',
+                unsafe_allow_html=True)
 
     response = requests.post(
         url=f'{BASE_URL}/get_english_level',
@@ -120,14 +122,19 @@ def show_conversation_summary():
             </div>
         ''', unsafe_allow_html=True)
 
-        st.markdown('<div class="action-button centered">', unsafe_allow_html=True)
-        if st.button("🏠 Back to Main Menu", key="back_to_main"):
-            st.session_state['thread_id'] = None
-            st.session_state['step_of_conversation'] = 0
-            st.session_state['conversation'] = []
+        st.session_state['thread_id'] = None
+        st.session_state['step_of_conversation'] = 0
+        st.session_state['conversation'] = []
 
+        st.markdown('<div class="action-button centered">',
+                    unsafe_allow_html=True)
+
+        if st.button("🏠 Back to Main Menu", key="back_to_main"):
             st.session_state['page'] = 'choose_wtd'
             st.rerun()
+
         st.markdown('</div>', unsafe_allow_html=True)
+
     else:
-        st.error("There was a problem retrieving your test results. Please try again later.")
+        st.error(
+            "There was a problem retrieving your test results. Please try again later.")
