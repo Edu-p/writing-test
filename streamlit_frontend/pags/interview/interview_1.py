@@ -4,10 +4,9 @@ import requests
 import os
 import base64
 
-load_dotenv()
+load_dotenv(dotenv_path='../../.env')
 
 BASE_URL = os.getenv('BASE_URL')
-
 
 def explanation_of_test_interview():
     st.markdown(
