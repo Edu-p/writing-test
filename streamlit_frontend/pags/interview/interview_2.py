@@ -116,6 +116,10 @@ def interview_test():
     st.markdown('<div class="back-button">', unsafe_allow_html=True)
     if st.button("← Back", key="back"):
         st.session_state['page'] = 'choose_wtc'
+        st.session_state['step_of_conversation_interview'] = 0
+        st.session_state['conversation'] = [] 
+        st.session_state['last_correction_interview'] = ""
+        st.session_state['thread_id'] = None
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -229,5 +233,6 @@ def interview_test():
         st.session_state['step_of_conversation_interview'] = 0
         st.session_state['conversation'] = [] 
         st.session_state['last_correction_interview'] = ""
+        st.session_state['thread_id'] = None
 
         st.rerun()

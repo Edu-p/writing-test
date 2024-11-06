@@ -13,6 +13,7 @@ def show_auth_form():
     st.markdown(
         """
         <style>
+
         /* Center the content */
         .auth-container {
             max-width: 400px;
@@ -40,7 +41,7 @@ def show_auth_form():
         }
 
         .login-button:hover {
-            background-color: #45a049;
+            background-color: #808080; !important /* Gray color */
         }
 
         /* Center and style the title */
