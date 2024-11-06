@@ -50,7 +50,6 @@ node_parser = SentenceWindowNodeParser.from_defaults(
 
 # helper functions
 
-
 def reconstruct_index(index_data):
     documents = [Document(text=doc['text']) for doc in index_data['documents']]
     nodes = node_parser.get_nodes_from_documents(documents)
@@ -67,6 +66,7 @@ def store_index(index, user_id, thread_id, index_type):
         'documents': [{'text': node.metadata['original_text']} for node in index.docstore.docs.values()],
     }
     db.QueryEngines.insert_one(index_data)
+    return None
 
 
 def create_interview_questions_index():
@@ -80,7 +80,7 @@ def create_interview_questions_index():
 
 
 def create_cv_index(user_id: str):
-    cv_data = db.CVs.find_one({'user_id': user_id})
+    cv_data = db.CVs.find_one({'user_id': user_id}, sort=[('_id', pymongo.DESCENDING)])
     document = Document(text=cv_data['pdf_text'])
     nodes = node_parser.get_nodes_from_documents([document])
     index = VectorStoreIndex(nodes)
@@ -162,8 +162,8 @@ def interview_chat_gen():
     try:
         # interview question index
         interview_index_data = db.QueryEngines.find_one({
-            'user_id': user_id,
-            'thread_id': thread_id,
+            'user_id': user_id, 
+            'thread_id': thread_id, 
             'type': 'interview_questions'
         })
 
