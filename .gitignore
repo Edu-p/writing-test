@@ -7,3 +7,15 @@
 /streamlit_frontend/pags/report_activity/__pycache__/
 
 /flask_backend/.env
+
+/flask_backend/utils/report_activity/__pycache__/
+
+/flask_backend/__pycache__/
+
+/.vscode/
+
+/flask_backend/routes/__pycache__/
+
+/flask_backend/utils/__pycache__/
+
+/flask_backend/del_later.ipynb

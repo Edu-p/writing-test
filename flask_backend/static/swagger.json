@@ -31,11 +31,17 @@
     {
       "name": "tests",
       "description": "Endpoints related to tests"
+    },
+    {
+      "name": "store_cv",
+      "description": "Endpoints related to storing CVs"
+    },
+    {
+      "name": "interview_chat",
+      "description": "chat related to interview"
     }
   ],
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "paths": {
     "/auth": {
       "post": {
@@ -354,6 +360,131 @@
               "type": "array",
               "items": {
                 "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/store_cv_db": {
+      "post": {
+        "tags": ["store_cv"],
+        "summary": "Store CV",
+        "description": "Store a CV in the database",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "CV details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
+                },
+                "pdf_base64": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF text stored successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "PDF not found",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/interview_chat": {
+      "post": {
+        "tags": ["interview_chat"],
+        "summary": "Generate interview chat response",
+        "description": "Generate interview chat based on user input",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Interview chat details",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": {
+                  "type": "string"
+                },
+                "thread_id": {
+                  "type": "string"
+                },
+                "content": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful interview chat response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "response": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing required fields",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string"
+                }
               }
             }
           }

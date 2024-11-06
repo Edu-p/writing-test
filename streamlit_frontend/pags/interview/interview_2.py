@@ -8,7 +8,7 @@ load_dotenv(dotenv_path='../../.env')
 BASE_URL = os.getenv('BASE_URL')
 
 
-def report_test():
+def interview_test():
     st.markdown(
         """
         <style>
@@ -116,14 +116,14 @@ def report_test():
     st.markdown('<div class="back-button">', unsafe_allow_html=True)
     if st.button("← Back", key="back"):
         st.session_state['page'] = 'choose_wtc'
-        st.session_state['step_of_conversation'] = 0
-        st.session_state['conversation'] = []  
-        st.session_state['last_correction'] = ""
-        st.session_state['last_correction'] = None
+        st.session_state['step_of_conversation_interview'] = 0
+        st.session_state['conversation'] = [] 
+        st.session_state['last_correction_interview'] = ""
+        st.session_state['thread_id'] = None
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="chat-title">Report Activity Test</div>',
+    st.markdown('<div class="chat-title">Interview Test</div>',
                 unsafe_allow_html=True)
 
     if 'user_id' not in st.session_state:
@@ -132,12 +132,12 @@ def report_test():
         st.session_state['conversation'] = []
     if 'thread_id' not in st.session_state:
         st.session_state['thread_id'] = None
-    if 'step_of_conversation' not in st.session_state:
-        st.session_state['step_of_conversation'] = 0
+    if 'step_of_conversation_interview' not in st.session_state:
+        st.session_state['step_of_conversation_interview'] = 0
     if 'user_input' not in st.session_state:
         st.session_state['user_input'] = ""
-    if 'last_correction' not in st.session_state:
-        st.session_state['last_correction'] = ""
+    if 'last_correction_interview' not in st.session_state:
+        st.session_state['last_correction_interview'] = ""
 
     user_id = st.session_state['user_id']
     thread_id = st.session_state['thread_id']
@@ -147,7 +147,7 @@ def report_test():
             url=f'{BASE_URL}/get_conversation',
             json={
                 'user_id': user_id,
-                'type_of_test': 'report'
+                'type_of_test': 'interview'
             }
         )
         if response.status_code == 200:
@@ -155,14 +155,13 @@ def report_test():
             st.session_state['thread_id'] = data['thread_id']
         else:
             st.error("Failed to start the conversation. Please try again.")
-            return
 
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
-    if st.session_state['step_of_conversation'] == 0:
-        initial_bot_message = "Hi! I'm your tech lead. Can you tell me what you did?"
+    if st.session_state['step_of_conversation_interview'] == 0:
+        initial_bot_message = "Hi! What is the project you are most proud of, and how did you contribute to it?"
         st.session_state['conversation'].append(
             {'sender': 'bot', 'message': initial_bot_message})
-        st.session_state['step_of_conversation'] += 1
+        st.session_state['step_of_conversation_interview'] += 1
 
     for msg in st.session_state['conversation']:
         sender = msg['sender']
@@ -181,8 +180,8 @@ def report_test():
             ''', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-    if st.session_state['last_correction']:
-        correction = st.session_state['last_correction'].replace('\n', '<br>')
+    if st.session_state['last_correction_interview']:
+        correction = st.session_state['last_correction_interview'].replace('\n', '<br>')
         st.markdown(f'''
             <div class="correction-box">
                 <strong>Correction of your last message:</strong><br>
@@ -190,10 +189,10 @@ def report_test():
             </div>
         ''', unsafe_allow_html=True)
 
-    if st.session_state['step_of_conversation'] <= 3:
+    if st.session_state['step_of_conversation_interview'] <= 5:
         st.markdown('<div class="message-input">', unsafe_allow_html=True)
         user_input = st.text_area(
-            f"Your message ({st.session_state['step_of_conversation']}/3):", value=st.session_state['user_input'], height=100)
+            f"Your message ({st.session_state['step_of_conversation_interview']}/5):", value=st.session_state['user_input'], height=100)
         st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown('<div class="send-button">', unsafe_allow_html=True)
@@ -202,10 +201,10 @@ def report_test():
                 st.session_state['conversation'].append(
                     {'sender': 'user', 'message': user_input})
                 st.session_state['user_input'] = ""
-                st.session_state['step_of_conversation'] += 1
+                st.session_state['step_of_conversation_interview'] += 1
 
                 response = requests.post(
-                    url=f'{BASE_URL}/chat',
+                    url=f'{BASE_URL}/interview_chat',
                     json={
                         'user_id': user_id,
                         'thread_id': st.session_state['thread_id'],
@@ -220,7 +219,7 @@ def report_test():
 
                     st.session_state['conversation'].append(
                         {'sender': 'bot', 'message': llm_response})
-                    st.session_state['last_correction'] = llm_correction
+                    st.session_state['last_correction_interview'] = llm_correction
 
                     st.rerun()
                 else:
@@ -231,9 +230,9 @@ def report_test():
     else:
         st.success("Conversation completed. Redirecting...")
         st.session_state['page'] = 'report_activity_3'
-        st.session_state['step_of_conversation'] = 0
-        st.session_state['conversation'] = []  
-        st.session_state['last_correction'] = ""
-        st.session_state['last_correction'] = None
+        st.session_state['step_of_conversation_interview'] = 0
+        st.session_state['conversation'] = [] 
+        st.session_state['last_correction_interview'] = ""
+        st.session_state['thread_id'] = None
 
         st.rerun()

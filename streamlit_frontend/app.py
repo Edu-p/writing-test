@@ -7,9 +7,12 @@ from pags.report_activity.report_activity_2 import report_test
 from pags.report_activity.report_activity_3 import show_conversation_summary
 from pags.view_metrics import view_overall_metrics
 from pags.past_tests import show_import_tests
+from pags.interview.interview_1 import explanation_of_test_interview
+from pags.interview.interview_2 import interview_test
 
 
-st.set_page_config(page_title="Writing Test Platform", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Writing Test Platform",
+                   layout="centered", initial_sidebar_state="collapsed")
 
 if 'page' not in st.session_state:
     st.session_state['page'] = 'auth'
@@ -29,6 +32,12 @@ elif st.session_state['page'] == 'report_activity_2':
     report_test()
 elif st.session_state['page'] == 'report_activity_3':
     show_conversation_summary()
+
+# flux interview
+elif st.session_state['page'] == 'interview_1':
+    explanation_of_test_interview()
+elif st.session_state['page'] == 'interview_2':
+    interview_test()
 
 # flux see metrics
 elif st.session_state['page'] == 'view_overall':
