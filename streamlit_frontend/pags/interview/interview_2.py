@@ -189,10 +189,10 @@ def interview_test():
             </div>
         ''', unsafe_allow_html=True)
 
-    if st.session_state['step_of_conversation_interview'] < 6:
+    if st.session_state['step_of_conversation_interview'] <= 5:
         st.markdown('<div class="message-input">', unsafe_allow_html=True)
         user_input = st.text_area(
-            "Your message:", value=st.session_state['user_input'], height=100)
+            f"Your message ({st.session_state['step_of_conversation_interview']}/5):", value=st.session_state['user_input'], height=100)
         st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown('<div class="send-button">', unsafe_allow_html=True)

@@ -116,6 +116,10 @@ def report_test():
     st.markdown('<div class="back-button">', unsafe_allow_html=True)
     if st.button("← Back", key="back"):
         st.session_state['page'] = 'choose_wtc'
+        st.session_state['step_of_conversation'] = 0
+        st.session_state['conversation'] = []  
+        st.session_state['last_correction'] = ""
+        st.session_state['last_correction'] = None
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -186,10 +190,10 @@ def report_test():
             </div>
         ''', unsafe_allow_html=True)
 
-    if st.session_state['step_of_conversation'] < 4:
+    if st.session_state['step_of_conversation'] <= 3:
         st.markdown('<div class="message-input">', unsafe_allow_html=True)
         user_input = st.text_area(
-            "Your message:", value=st.session_state['user_input'], height=100)
+            f"Your message ({st.session_state['step_of_conversation']}/3):", value=st.session_state['user_input'], height=100)
         st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown('<div class="send-button">', unsafe_allow_html=True)
@@ -230,5 +234,6 @@ def report_test():
         st.session_state['step_of_conversation'] = 0
         st.session_state['conversation'] = []  
         st.session_state['last_correction'] = ""
+        st.session_state['last_correction'] = None
 
         st.rerun()
