@@ -163,6 +163,7 @@ def report_test():
         st.session_state['conversation'].append(
             {'sender': 'bot', 'message': initial_bot_message})
         st.session_state['step_of_conversation'] += 1
+        st.session_state['last_correction'] = ""
 
     for msg in st.session_state['conversation']:
         sender = msg['sender']
