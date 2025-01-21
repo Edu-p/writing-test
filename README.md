@@ -12,6 +12,10 @@ Each user can view their metrics and reviews of each test (features under develo
 
 The project was developed using the Streamlit framework for the frontend (a Python library) and Flask for the backend. MongoDB is used as the database, and everything is hosted on Render (both frontend and backend).
 
+## Demo
+![2025-01-2110-11-24-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/8cb76c5d-c097-4866-b368-908bef7a17aa)
+
+
 ## Technical Description
 
 To run the project locally, you will need to set up the following environment variables:
